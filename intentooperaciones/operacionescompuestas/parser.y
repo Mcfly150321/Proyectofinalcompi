@@ -6,6 +6,11 @@ int yylex(void);
 void yyerror(const char *s);
 
 int contador = 0;
+int c_suma = 0;
+int c_resta = 0;
+int c_multi = 0;  
+int c_divi = 0;
+int c_expo = 0;
 extern int linea_actual; /* <--- Traemos la variable desde Flex */
 }
 
@@ -26,13 +31,26 @@ operacion:
   ;
 
 linea:
-    { contador = 0; } operador extension NEWLINE {
-        /* Restamos 1 porque el NEWLINE ya fue procesado por Flex e incrementó la línea */
+    { contador = 0; c_suma=0; c_resta=0; c_multi=0; c_divi=0; c_expo=0;} 
+    operador extension NEWLINE {
         int l = linea_actual - 1; 
         
-        if (contador == 1) {
-            printf(" -> LINEA %d: CADENA VÁLIDA: SUMA/RESTA SIMPLE\n", l);
-        } else if (contador > 1) {
+        if (contador == 1 && c_suma == 1) {
+            printf(" -> LINEA %d: CADENA VÁLIDA: SUMA SIMPLE\n", l);
+        } 
+        else if (contador == 1 && c_resta == 1) {
+            printf(" -> LINEA %d: CADENA VÁLIDA: RESTA SIMPLE\n", l);
+        } 
+        else if (contador == 1 && c_multi == 1) {
+            printf(" -> LINEA %d: CADENA VÁLIDA: MULTIPLICACIÓN SIMPLE\n", l);
+        } 
+        else if (contador == 1 && c_divi == 1) {
+            printf(" -> LINEA %d: CADENA VÁLIDA: DIVISIÓN SIMPLE\n", l);
+        } 
+        else if (contador == 1 && c_expo == 1) {
+            printf(" -> LINEA %d: CADENA VÁLIDA: POTENCIACIÓN SIMPLE\n", l);
+        }
+        else if (contador > 1) {
             printf(" -> LINEA %d: CADENA VÁLIDA: OPERACIÓN COMPUESTA (Contador: %d)\n", l, contador);
         } else {
             printf(" -> LINEA %d: CADENA VÁLIDA: SOLO UN OPERANDO SUELTO\n", l);
@@ -43,11 +61,11 @@ linea:
   ;
 extension:
     %empty
-  | extension suma  { contador++; }
-  | extension resta { contador++; }
-  | extension multuplicacion { contador++; }
-  | extension division { contador++; }
-  | extension potenciacion { contador++; }
+  | extension suma  { contador++; c_suma++; }
+  | extension resta { contador++; c_resta++; }
+  | extension multuplicacion { contador++; c_multi++; }
+  | extension division { contador++; c_divi++; }
+  | extension potenciacion { contador++; c_expo++; }
   ;
   
 suma:

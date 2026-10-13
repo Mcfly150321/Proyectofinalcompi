@@ -73,9 +73,14 @@ int yylex(void);
 void yyerror(const char *s);
 
 int contador = 0;
+int c_suma = 0;
+int c_resta = 0;
+int c_multi = 0;  
+int c_divi = 0;
+int c_expo = 0;
 extern int linea_actual; /* <--- Traemos la variable desde Flex */
 
-#line 79 "parser.tab.c"
+#line 84 "parser.tab.c"
 
 
 
@@ -539,9 +544,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    24,    24,    25,    29,    29,    41,    42,    45,    46,
-      47,    48,    49,    50,    54,    58,    62,    65,    68,    71,
-      74,    77,    80,    83,    85,    86
+       0,    29,    29,    30,    34,    34,    59,    60,    63,    64,
+      65,    66,    67,    68,    72,    76,    80,    83,    86,    89,
+      92,    95,    98,   101,   103,   104
 };
 #endif
 
@@ -1123,72 +1128,84 @@ yyreduce:
   switch (yyn)
     {
   case 4: /* $@1: %empty  */
-#line 29 "parser.y"
-    { contador = 0; }
-#line 1129 "parser.tab.c"
+#line 34 "parser.y"
+    { contador = 0; c_suma=0; c_resta=0; c_multi=0; c_divi=0; c_expo=0;}
+#line 1134 "parser.tab.c"
     break;
 
   case 5: /* linea: $@1 operador extension NEWLINE  */
-#line 29 "parser.y"
-                                                 {
-        /* Restamos 1 porque el NEWLINE ya fue procesado por Flex e incrementó la línea */
+#line 35 "parser.y"
+                               {
         int l = linea_actual - 1; 
         
-        if (contador == 1) {
-            printf(" -> LINEA %d: CADENA VÁLIDA: SUMA/RESTA SIMPLE\n", l);
-        } else if (contador > 1) {
+        if (contador == 1 && c_suma == 1) {
+            printf(" -> LINEA %d: CADENA VÁLIDA: SUMA SIMPLE\n", l);
+        } 
+        else if (contador == 1 && c_resta == 1) {
+            printf(" -> LINEA %d: CADENA VÁLIDA: RESTA SIMPLE\n", l);
+        } 
+        else if (contador == 1 && c_multi == 1) {
+            printf(" -> LINEA %d: CADENA VÁLIDA: MULTIPLICACIÓN SIMPLE\n", l);
+        } 
+        else if (contador == 1 && c_divi == 1) {
+            printf(" -> LINEA %d: CADENA VÁLIDA: DIVISIÓN SIMPLE\n", l);
+        } 
+        else if (contador == 1 && c_expo == 1) {
+            printf(" -> LINEA %d: CADENA VÁLIDA: POTENCIACIÓN SIMPLE\n", l);
+        }
+        else if (contador > 1) {
             printf(" -> LINEA %d: CADENA VÁLIDA: OPERACIÓN COMPUESTA (Contador: %d)\n", l, contador);
         } else {
             printf(" -> LINEA %d: CADENA VÁLIDA: SOLO UN OPERANDO SUELTO\n", l);
         }
     }
-#line 1146 "parser.tab.c"
+#line 1163 "parser.tab.c"
     break;
 
   case 6: /* linea: NEWLINE  */
-#line 41 "parser.y"
+#line 59 "parser.y"
                    { /* ignorar líneas vacías */ }
-#line 1152 "parser.tab.c"
+#line 1169 "parser.tab.c"
     break;
 
   case 7: /* linea: error NEWLINE  */
-#line 42 "parser.y"
+#line 60 "parser.y"
                    { printf(" -> LINEA %d: CADENA INVÁLIDA\n", linea_actual - 1); yyerrok; }
-#line 1158 "parser.tab.c"
+#line 1175 "parser.tab.c"
     break;
 
   case 9: /* extension: extension suma  */
-#line 46 "parser.y"
-                    { contador++; }
-#line 1164 "parser.tab.c"
+#line 64 "parser.y"
+                    { contador++; c_suma++; }
+#line 1181 "parser.tab.c"
     break;
 
   case 10: /* extension: extension resta  */
-#line 47 "parser.y"
-                    { contador++; }
-#line 1170 "parser.tab.c"
+#line 65 "parser.y"
+                    { contador++; c_resta++; }
+#line 1187 "parser.tab.c"
     break;
 
   case 11: /* extension: extension multuplicacion  */
-#line 48 "parser.y"
-                             { contador++; }
-#line 1176 "parser.tab.c"
+#line 66 "parser.y"
+                             { contador++; c_multi++; }
+#line 1193 "parser.tab.c"
     break;
 
   case 12: /* extension: extension division  */
-#line 49 "parser.y"
-                       { contador++; }
-#line 1182 "parser.tab.c"
+#line 67 "parser.y"
+                       { contador++; c_divi++; }
+#line 1199 "parser.tab.c"
     break;
 
   case 13: /* extension: extension potenciacion  */
-#line 50 "parser.y"
-                           { contador++; }
-#line 1188 "parser.tab.c"
+#line 68 "parser.y"
+                           { contador++; c_expo++; }
+#line 1205 "parser.tab.c"
     break;
 
 
-#line 1192 "parser.tab.c"
+#line 1209 "parser.tab.c"
 
       default: break;
     }
@@ -1381,7 +1398,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 89 "parser.y"
+#line 107 "parser.y"
 
 
 void yyerror(const char *s) {
