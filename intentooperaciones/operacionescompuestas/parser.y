@@ -19,15 +19,14 @@ extern int linea_actual; /* <--- Traemos la variable desde Flex */
 %token TK_PAB TK_PCE
 %token TK_MAY TK_MEN TK_MAIG TK_MEIG TK_IG TK_NIG
 %token TK_AND TK_OR
-%token TK_ASIG TK_EOS
-%token TK_ALLOCATE TK_MAIN TK_INPUT TK_OUTPUT TK_IF TK_ELSE
-%token NEWLINE
+%token TK_ASIG TK_EOS TK_COMA
+%token TK_ALLOCATE TK_MAIN TK_INPUT TK_OUTPUT TK_IF TK_ELSE TK_DEC
+%token NEWLINE DOLLAR VACIO
 
 %%
-
-operacion:
+inicio:
     %empty
-  | operacion linea
+  | inicio linea
   ;
 
 linea:
@@ -56,9 +55,13 @@ linea:
             printf(" -> LINEA %d: CADENA VÁLIDA: SOLO UN OPERANDO SUELTO\n", l);
         }
     }
+  | declaracion NEWLINE {
+        printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual - 1);
+    }
   | NEWLINE        { /* ignorar líneas vacías */ }
   | error NEWLINE  { printf(" -> LINEA %d: CADENA INVÁLIDA\n", linea_actual - 1); yyerrok; }
   ;
+
 extension:
     %empty
   | extension suma  { contador++; c_suma++; }
@@ -67,7 +70,7 @@ extension:
   | extension division { contador++; c_divi++; }
   | extension potenciacion { contador++; c_expo++; }
   ;
-  
+
 suma:
      sumar operador
   ;
@@ -99,10 +102,25 @@ potenciacion:
   ;
 potenciar:
     TK_POTENCIACION
+    ;
 operador:
     TK_NUMERO
   | TK_ID
+  | variable
   ;
+
+declaracion:
+    TK_DEC variable otra_variable opc_eos
+  ;
+opc_eos:
+    TK_EOS
+  | %empty
+  ;
+otra_variable: TK_COMA variable otra_variable
+    | %empty
+    ;
+variable:  DOLLAR TK_ID
+    ;
 
 %%
 
@@ -114,7 +132,6 @@ int main(void) {
     printf("=====================================================\n");
     printf("   ANALIZADOR SINTÁCTICO DE SUMAS EN EASYLANG    \n");
     printf("=====================================================\n");
-    printf("Ingrese cadenas para evaluar:\n\n");
     yyparse();
     return 0;
 }

@@ -73,13 +73,17 @@ extern int yydebug;
     TK_OR = 274,                   /* TK_OR  */
     TK_ASIG = 275,                 /* TK_ASIG  */
     TK_EOS = 276,                  /* TK_EOS  */
-    TK_ALLOCATE = 277,             /* TK_ALLOCATE  */
-    TK_MAIN = 278,                 /* TK_MAIN  */
-    TK_INPUT = 279,                /* TK_INPUT  */
-    TK_OUTPUT = 280,               /* TK_OUTPUT  */
-    TK_IF = 281,                   /* TK_IF  */
-    TK_ELSE = 282,                 /* TK_ELSE  */
-    NEWLINE = 283                  /* NEWLINE  */
+    TK_COMA = 277,                 /* TK_COMA  */
+    TK_ALLOCATE = 278,             /* TK_ALLOCATE  */
+    TK_MAIN = 279,                 /* TK_MAIN  */
+    TK_INPUT = 280,                /* TK_INPUT  */
+    TK_OUTPUT = 281,               /* TK_OUTPUT  */
+    TK_IF = 282,                   /* TK_IF  */
+    TK_ELSE = 283,                 /* TK_ELSE  */
+    TK_DEC = 284,                  /* TK_DEC  */
+    NEWLINE = 285,                 /* NEWLINE  */
+    DOLLAR = 286,                  /* DOLLAR  */
+    VACIO = 287                    /* VACIO  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

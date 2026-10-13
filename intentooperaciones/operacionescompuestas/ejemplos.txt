@@ -1,3 +1,6 @@
+DEC $a, $b;
+DEC $a, $c;
+DEC a, b;
 5 + 3
 10 - 4
 5+3+5
@@ -20,3 +23,6 @@ MAIN
 ALLOCATE
 INPUT
 OUTPUT
+DEC $a, $b;
+DEC $a, $c;
+DEC a, b;
