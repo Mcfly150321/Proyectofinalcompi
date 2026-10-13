@@ -11,7 +11,8 @@ int c_resta = 0;
 int c_multi = 0;  
 int c_divi = 0;
 int c_expo = 0;
-extern int linea_actual; /* <--- Traemos la variable desde Flex */
+int c_definicion = 0;
+extern int linea_actual;
 }
 
 %token TK_SUMA TK_RESTA TK_DIVISION TK_MULTIPLICACION TK_POTENCIACION
@@ -27,12 +28,26 @@ extern int linea_actual; /* <--- Traemos la variable desde Flex */
 
 operacion:
     %empty
-  | operacion linea
+  | operacion linea2
+  ;
+linea2:
+    variable seguirvariable
+    | numero seguirnumero
+    | error NEWLINE { printf(" -> LINEA %d: CADENA INVÁLIDA\n", linea_actual - 1); yyerrok;}
+    ;
+
+seguirvariable:
+   definicion {printf(" -> LINEA %d: CADENA VÁLIDA: DEFINICIÓN DE VARIABLE\n", linea_actual - 1);}
+  | operando 
+  | comparacion
   ;
 
-linea:
-    { contador = 0; c_suma=0; c_resta=0; c_multi=0; c_divi=0; c_expo=0;} 
-    operador extension NEWLINE {
+seguirnumero:
+    operando 
+  ;
+
+operando:
+ { contador = 0; c_suma=0; c_resta=0; c_multi=0; c_divi=0; c_expo=0;} extension NEWLINE {
         int l = linea_actual - 1; 
         
         if (contador == 1 && c_suma == 1) {
@@ -52,13 +67,14 @@ linea:
         }
         else if (contador > 1) {
             printf(" -> LINEA %d: CADENA VÁLIDA: OPERACIÓN COMPUESTA (Contador: %d)\n", l, contador);
-        } else {
+        } 
+        else {
             printf(" -> LINEA %d: CADENA VÁLIDA: SOLO UN OPERANDO SUELTO\n", l);
         }
-    }
-  | NEWLINE        { /* ignorar líneas vacías */ }
-  | error NEWLINE  { printf(" -> LINEA %d: CADENA INVÁLIDA\n", linea_actual - 1); yyerrok; }
-  ;
+
+    } 
+        ;
+
 extension:
     %empty
   | extension suma  { contador++; c_suma++; }
@@ -68,6 +84,27 @@ extension:
   | extension potenciacion { contador++; c_expo++; }
   ;
   
+
+definicion:
+    definir numero NEWLINE{
+        c_definicion++;
+    }
+    ;
+
+comparacion:
+ comparar numero NEWLINE 
+ | comparar variable NEWLINE
+ ;
+
+comparar:
+    TK_MAY {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MAYOR QUE\n", linea_actual);}
+  | TK_MEN {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MENOR QUE\n", linea_actual);}
+  | TK_MAIG {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MAYOR O IGUAL\n", linea_actual);}
+  | TK_MEIG {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MENOR O IGUAL\n", linea_actual);}
+  | TK_IG {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN IGUAL\n", linea_actual);}
+  | TK_NIG {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DISTINTO\n", linea_actual);}
+  ;
+/*aca se usa linea actual y no linea_actual-1 porque laa impersion se realiza al procesar comparar, siin newline todavia, sigifica que no se ha actualizado la linea para ese entonces */
 suma:
      sumar operador
   ;
@@ -100,10 +137,32 @@ potenciacion:
 potenciar:
     TK_POTENCIACION
 operador:
-    TK_NUMERO
-  | TK_ID
+    variable
+  | numero
   ;
 
+variable:
+    TK_ID
+  ;
+numero:
+    TK_NUMERO
+  ;
+definir:
+    TK_ASIG
+  ;
+
+/*
+
+
+
+linea:
+    
+    variable definicion {printf(" -> LINEA %d: CADENA VÁLIDA: DEFINICIÓN DE VARIABLE\n", linea_actual - 1);}
+    |
+  | NEWLINE        { }
+  | error NEWLINE  { printf(" -> LINEA %d: CADENA INVÁLIDA\n", linea_actual - 1); yyerrok; }
+  ;
+*/
 %%
 
 void yyerror(const char *s) {

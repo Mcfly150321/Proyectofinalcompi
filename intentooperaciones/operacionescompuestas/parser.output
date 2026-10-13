@@ -1,0 +1,546 @@
+Terminales no usados en la gramática
+
+    TK_PAB
+    TK_PCE
+    TK_MAY
+    TK_MEN
+    TK_MAIG
+    TK_MEIG
+    TK_IG
+    TK_NIG
+    TK_AND
+    TK_OR
+    TK_EOS
+    TK_ALLOCATE
+    TK_MAIN
+    TK_INPUT
+    TK_OUTPUT
+    TK_IF
+    TK_ELSE
+
+
+Gramática
+
+    0 $accept: operacion $end
+
+    1 operacion: ε
+    2          | operacion linea2
+
+    3 linea2: variable seguirvariable
+    4       | numero seguirnumero
+
+    5 seguirvariable: definicion
+    6               | operando
+
+    7 seguirnumero: operando
+
+    8 operando: operador extension NEWLINE
+
+    9 extension: ε
+   10          | extension suma
+   11          | extension resta
+   12          | extension multuplicacion
+   13          | extension division
+   14          | extension potenciacion
+
+   15 definicion: definir numero NEWLINE
+
+   16 suma: sumar operador
+
+   17 sumar: TK_SUMA
+
+   18 resta: restar operador
+
+   19 restar: TK_RESTA
+
+   20 multuplicacion: multiplicar operador
+
+   21 multiplicar: TK_MULTIPLICACION
+
+   22 division: dividir operador
+
+   23 dividir: TK_DIVISION
+
+   24 potenciacion: potenciar operador
+
+   25 potenciar: TK_POTENCIACION
+
+   26 operador: variable
+   27         | numero
+
+   28 variable: TK_ID
+
+   29 numero: TK_NUMERO
+
+   30 definir: TK_ASIG
+
+
+Terminales con las reglas donde aparecen
+
+    $end (0) 0
+    error (256)
+    TK_SUMA (258) 17
+    TK_RESTA (259) 19
+    TK_DIVISION (260) 23
+    TK_MULTIPLICACION (261) 21
+    TK_POTENCIACION (262) 25
+    TK_NUMERO (263) 29
+    TK_ID (264) 28
+    TK_PAB (265)
+    TK_PCE (266)
+    TK_MAY (267)
+    TK_MEN (268)
+    TK_MAIG (269)
+    TK_MEIG (270)
+    TK_IG (271)
+    TK_NIG (272)
+    TK_AND (273)
+    TK_OR (274)
+    TK_ASIG (275) 30
+    TK_EOS (276)
+    TK_ALLOCATE (277)
+    TK_MAIN (278)
+    TK_INPUT (279)
+    TK_OUTPUT (280)
+    TK_IF (281)
+    TK_ELSE (282)
+    NEWLINE (283) 8 15
+
+
+No terminales con las reglas donde aparecen
+
+    $accept (29)
+        on left: 0
+    operacion (30)
+        on left: 1 2
+        on right: 0 2
+    linea2 (31)
+        on left: 3 4
+        on right: 2
+    seguirvariable (32)
+        on left: 5 6
+        on right: 3
+    seguirnumero (33)
+        on left: 7
+        on right: 4
+    operando (34)
+        on left: 8
+        on right: 6 7
+    extension (35)
+        on left: 9 10 11 12 13 14
+        on right: 8 10 11 12 13 14
+    definicion (36)
+        on left: 15
+        on right: 5
+    suma (37)
+        on left: 16
+        on right: 10
+    sumar (38)
+        on left: 17
+        on right: 16
+    resta (39)
+        on left: 18
+        on right: 11
+    restar (40)
+        on left: 19
+        on right: 18
+    multuplicacion (41)
+        on left: 20
+        on right: 12
+    multiplicar (42)
+        on left: 21
+        on right: 20
+    division (43)
+        on left: 22
+        on right: 13
+    dividir (44)
+        on left: 23
+        on right: 22
+    potenciacion (45)
+        on left: 24
+        on right: 14
+    potenciar (46)
+        on left: 25
+        on right: 24
+    operador (47)
+        on left: 26 27
+        on right: 8 16 18 20 22 24
+    variable (48)
+        on left: 28
+        on right: 3 26
+    numero (49)
+        on left: 29
+        on right: 4 15 27
+    definir (50)
+        on left: 30
+        on right: 15
+
+
+Estado 0
+
+    0 $accept: • operacion $end
+
+    $default  reduce usando la regla 1 (operacion)
+
+    operacion  ir al estado 1
+
+
+Estado 1
+
+    0 $accept: operacion • $end
+    2 operacion: operacion • linea2
+
+    $end       desplazar e ir al estado 2
+    TK_NUMERO  desplazar e ir al estado 3
+    TK_ID      desplazar e ir al estado 4
+
+    linea2    ir al estado 5
+    variable  ir al estado 6
+    numero    ir al estado 7
+
+
+Estado 2
+
+    0 $accept: operacion $end •
+
+    $default  aceptar
+
+
+Estado 3
+
+   29 numero: TK_NUMERO •
+
+    $default  reduce usando la regla 29 (numero)
+
+
+Estado 4
+
+   28 variable: TK_ID •
+
+    $default  reduce usando la regla 28 (variable)
+
+
+Estado 5
+
+    2 operacion: operacion linea2 •
+
+    $default  reduce usando la regla 2 (operacion)
+
+
+Estado 6
+
+    3 linea2: variable • seguirvariable
+
+    TK_NUMERO  desplazar e ir al estado 3
+    TK_ID      desplazar e ir al estado 4
+    TK_ASIG    desplazar e ir al estado 8
+
+    seguirvariable  ir al estado 9
+    operando        ir al estado 10
+    definicion      ir al estado 11
+    operador        ir al estado 12
+    variable        ir al estado 13
+    numero          ir al estado 14
+    definir         ir al estado 15
+
+
+Estado 7
+
+    4 linea2: numero • seguirnumero
+
+    TK_NUMERO  desplazar e ir al estado 3
+    TK_ID      desplazar e ir al estado 4
+
+    seguirnumero  ir al estado 16
+    operando      ir al estado 17
+    operador      ir al estado 12
+    variable      ir al estado 13
+    numero        ir al estado 14
+
+
+Estado 8
+
+   30 definir: TK_ASIG •
+
+    $default  reduce usando la regla 30 (definir)
+
+
+Estado 9
+
+    3 linea2: variable seguirvariable •
+
+    $default  reduce usando la regla 3 (linea2)
+
+
+Estado 10
+
+    6 seguirvariable: operando •
+
+    $default  reduce usando la regla 6 (seguirvariable)
+
+
+Estado 11
+
+    5 seguirvariable: definicion •
+
+    $default  reduce usando la regla 5 (seguirvariable)
+
+
+Estado 12
+
+    8 operando: operador • extension NEWLINE
+
+    $default  reduce usando la regla 9 (extension)
+
+    extension  ir al estado 18
+
+
+Estado 13
+
+   26 operador: variable •
+
+    $default  reduce usando la regla 26 (operador)
+
+
+Estado 14
+
+   27 operador: numero •
+
+    $default  reduce usando la regla 27 (operador)
+
+
+Estado 15
+
+   15 definicion: definir • numero NEWLINE
+
+    TK_NUMERO  desplazar e ir al estado 3
+
+    numero  ir al estado 19
+
+
+Estado 16
+
+    4 linea2: numero seguirnumero •
+
+    $default  reduce usando la regla 4 (linea2)
+
+
+Estado 17
+
+    7 seguirnumero: operando •
+
+    $default  reduce usando la regla 7 (seguirnumero)
+
+
+Estado 18
+
+    8 operando: operador extension • NEWLINE
+   10 extension: extension • suma
+   11          | extension • resta
+   12          | extension • multuplicacion
+   13          | extension • division
+   14          | extension • potenciacion
+
+    TK_SUMA            desplazar e ir al estado 20
+    TK_RESTA           desplazar e ir al estado 21
+    TK_DIVISION        desplazar e ir al estado 22
+    TK_MULTIPLICACION  desplazar e ir al estado 23
+    TK_POTENCIACION    desplazar e ir al estado 24
+    NEWLINE            desplazar e ir al estado 25
+
+    suma            ir al estado 26
+    sumar           ir al estado 27
+    resta           ir al estado 28
+    restar          ir al estado 29
+    multuplicacion  ir al estado 30
+    multiplicar     ir al estado 31
+    division        ir al estado 32
+    dividir         ir al estado 33
+    potenciacion    ir al estado 34
+    potenciar       ir al estado 35
+
+
+Estado 19
+
+   15 definicion: definir numero • NEWLINE
+
+    NEWLINE  desplazar e ir al estado 36
+
+
+Estado 20
+
+   17 sumar: TK_SUMA •
+
+    $default  reduce usando la regla 17 (sumar)
+
+
+Estado 21
+
+   19 restar: TK_RESTA •
+
+    $default  reduce usando la regla 19 (restar)
+
+
+Estado 22
+
+   23 dividir: TK_DIVISION •
+
+    $default  reduce usando la regla 23 (dividir)
+
+
+Estado 23
+
+   21 multiplicar: TK_MULTIPLICACION •
+
+    $default  reduce usando la regla 21 (multiplicar)
+
+
+Estado 24
+
+   25 potenciar: TK_POTENCIACION •
+
+    $default  reduce usando la regla 25 (potenciar)
+
+
+Estado 25
+
+    8 operando: operador extension NEWLINE •
+
+    $default  reduce usando la regla 8 (operando)
+
+
+Estado 26
+
+   10 extension: extension suma •
+
+    $default  reduce usando la regla 10 (extension)
+
+
+Estado 27
+
+   16 suma: sumar • operador
+
+    TK_NUMERO  desplazar e ir al estado 3
+    TK_ID      desplazar e ir al estado 4
+
+    operador  ir al estado 37
+    variable  ir al estado 13
+    numero    ir al estado 14
+
+
+Estado 28
+
+   11 extension: extension resta •
+
+    $default  reduce usando la regla 11 (extension)
+
+
+Estado 29
+
+   18 resta: restar • operador
+
+    TK_NUMERO  desplazar e ir al estado 3
+    TK_ID      desplazar e ir al estado 4
+
+    operador  ir al estado 38
+    variable  ir al estado 13
+    numero    ir al estado 14
+
+
+Estado 30
+
+   12 extension: extension multuplicacion •
+
+    $default  reduce usando la regla 12 (extension)
+
+
+Estado 31
+
+   20 multuplicacion: multiplicar • operador
+
+    TK_NUMERO  desplazar e ir al estado 3
+    TK_ID      desplazar e ir al estado 4
+
+    operador  ir al estado 39
+    variable  ir al estado 13
+    numero    ir al estado 14
+
+
+Estado 32
+
+   13 extension: extension division •
+
+    $default  reduce usando la regla 13 (extension)
+
+
+Estado 33
+
+   22 division: dividir • operador
+
+    TK_NUMERO  desplazar e ir al estado 3
+    TK_ID      desplazar e ir al estado 4
+
+    operador  ir al estado 40
+    variable  ir al estado 13
+    numero    ir al estado 14
+
+
+Estado 34
+
+   14 extension: extension potenciacion •
+
+    $default  reduce usando la regla 14 (extension)
+
+
+Estado 35
+
+   24 potenciacion: potenciar • operador
+
+    TK_NUMERO  desplazar e ir al estado 3
+    TK_ID      desplazar e ir al estado 4
+
+    operador  ir al estado 41
+    variable  ir al estado 13
+    numero    ir al estado 14
+
+
+Estado 36
+
+   15 definicion: definir numero NEWLINE •
+
+    $default  reduce usando la regla 15 (definicion)
+
+
+Estado 37
+
+   16 suma: sumar operador •
+
+    $default  reduce usando la regla 16 (suma)
+
+
+Estado 38
+
+   18 resta: restar operador •
+
+    $default  reduce usando la regla 18 (resta)
+
+
+Estado 39
+
+   20 multuplicacion: multiplicar operador •
+
+    $default  reduce usando la regla 20 (multuplicacion)
+
+
+Estado 40
+
+   22 division: dividir operador •
+
+    $default  reduce usando la regla 22 (division)
+
+
+Estado 41
+
+   24 potenciacion: potenciar operador •
+
+    $default  reduce usando la regla 24 (potenciacion)
