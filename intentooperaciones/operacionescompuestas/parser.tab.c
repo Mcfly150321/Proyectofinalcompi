@@ -68,6 +68,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int yylex(void);
 void yyerror(const char *s);
@@ -79,9 +80,10 @@ int c_multi = 0;
 int c_divi = 0;
 int c_expo = 0;
 int c_definicion = 0;
+char tipo[20] = ""; 
 extern int linea_actual;
 
-#line 85 "parser.tab.c"
+#line 87 "parser.tab.c"
 
 
 
@@ -554,11 +556,11 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    30,    30,    31,    34,    35,    36,    40,    41,    42,
-      46,    50,    50,    79,    80,    81,    82,    83,    84,    89,
-      95,    96,   100,   101,   102,   103,   104,   105,   109,   113,
-     117,   120,   123,   126,   129,   132,   135,   138,   140,   141,
-     145,   148,   151
+       0,    32,    32,    33,    36,    37,    38,    42,    43,    44,
+      48,    52,    52,    81,    82,    83,    84,    85,    86,    91,
+      97,    98,   102,   103,   104,   105,   106,   107,   111,   115,
+     119,   122,   125,   128,   131,   134,   137,   140,   142,   143,
+     147,   150,   153
 };
 #endif
 
@@ -1156,25 +1158,25 @@ yyreduce:
   switch (yyn)
     {
   case 6: /* linea2: error NEWLINE  */
-#line 36 "parser.y"
+#line 38 "parser.y"
                     { printf(" -> LINEA %d: CADENA INVÁLIDA\n", linea_actual - 1); yyerrok;}
-#line 1162 "parser.tab.c"
+#line 1164 "parser.tab.c"
     break;
 
   case 7: /* seguirvariable: definicion  */
-#line 40 "parser.y"
+#line 42 "parser.y"
               {printf(" -> LINEA %d: CADENA VÁLIDA: DEFINICIÓN DE VARIABLE\n", linea_actual - 1);}
-#line 1168 "parser.tab.c"
+#line 1170 "parser.tab.c"
     break;
 
   case 11: /* $@1: %empty  */
-#line 50 "parser.y"
+#line 52 "parser.y"
  { contador = 0; c_suma=0; c_resta=0; c_multi=0; c_divi=0; c_expo=0;}
-#line 1174 "parser.tab.c"
+#line 1176 "parser.tab.c"
     break;
 
   case 12: /* operando: $@1 extension NEWLINE  */
-#line 50 "parser.y"
+#line 52 "parser.y"
                                                                                         {
         int l = linea_actual - 1; 
         
@@ -1201,85 +1203,97 @@ yyreduce:
         }
 
     }
-#line 1205 "parser.tab.c"
+#line 1207 "parser.tab.c"
     break;
 
   case 14: /* extension: extension suma  */
-#line 80 "parser.y"
+#line 82 "parser.y"
                     { contador++; c_suma++; }
-#line 1211 "parser.tab.c"
+#line 1213 "parser.tab.c"
     break;
 
   case 15: /* extension: extension resta  */
-#line 81 "parser.y"
+#line 83 "parser.y"
                     { contador++; c_resta++; }
-#line 1217 "parser.tab.c"
+#line 1219 "parser.tab.c"
     break;
 
   case 16: /* extension: extension multuplicacion  */
-#line 82 "parser.y"
+#line 84 "parser.y"
                              { contador++; c_multi++; }
-#line 1223 "parser.tab.c"
+#line 1225 "parser.tab.c"
     break;
 
   case 17: /* extension: extension division  */
-#line 83 "parser.y"
+#line 85 "parser.y"
                        { contador++; c_divi++; }
-#line 1229 "parser.tab.c"
+#line 1231 "parser.tab.c"
     break;
 
   case 18: /* extension: extension potenciacion  */
-#line 84 "parser.y"
+#line 86 "parser.y"
                            { contador++; c_expo++; }
-#line 1235 "parser.tab.c"
+#line 1237 "parser.tab.c"
     break;
 
   case 19: /* definicion: definir numero NEWLINE  */
-#line 89 "parser.y"
+#line 91 "parser.y"
                           {
         c_definicion++;
     }
-#line 1243 "parser.tab.c"
+#line 1245 "parser.tab.c"
+    break;
+
+  case 20: /* comparacion: comparar numero NEWLINE  */
+#line 97 "parser.y"
+                         {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
+#line 1251 "parser.tab.c"
+    break;
+
+  case 21: /* comparacion: comparar variable NEWLINE  */
+#line 98 "parser.y"
+                             {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
+#line 1257 "parser.tab.c"
     break;
 
   case 22: /* comparar: TK_MAY  */
-#line 100 "parser.y"
-           {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MAYOR QUE\n", linea_actual);}
-#line 1249 "parser.tab.c"
+#line 102 "parser.y"
+           {strcpy(tipo, "MAYOR QUE");}
+#line 1263 "parser.tab.c"
     break;
 
   case 23: /* comparar: TK_MEN  */
-#line 101 "parser.y"
-           {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MENOR QUE\n", linea_actual);}
-#line 1255 "parser.tab.c"
+#line 103 "parser.y"
+           {strcpy(tipo, "MENOR QUE");}
+#line 1269 "parser.tab.c"
     break;
 
   case 24: /* comparar: TK_MAIG  */
-#line 102 "parser.y"
-            {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MAYOR O IGUAL\n", linea_actual);}
-#line 1261 "parser.tab.c"
+#line 104 "parser.y"
+            {strcpy(tipo, "MAYOR O IGUAL");}
+#line 1275 "parser.tab.c"
     break;
 
   case 25: /* comparar: TK_MEIG  */
-#line 103 "parser.y"
-            {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MENOR O IGUAL\n", linea_actual);}
-#line 1267 "parser.tab.c"
+#line 105 "parser.y"
+            {strcpy(tipo, "MENOR O IGUAL");;}
+#line 1281 "parser.tab.c"
     break;
 
   case 26: /* comparar: TK_IG  */
-#line 104 "parser.y"
-          {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN IGUAL\n", linea_actual);}
-#line 1273 "parser.tab.c"
+#line 106 "parser.y"
+          {strcpy(tipo, "IGUAL");}
+#line 1287 "parser.tab.c"
     break;
 
   case 27: /* comparar: TK_NIG  */
-#line 105 "parser.y"
-           {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DISTINTO\n", linea_actual);}
-#line 1279 "parser.tab.c"
+#line 107 "parser.y"
+           {strcpy(tipo, "DISTINTO");}
+#line 1293 "parser.tab.c"
     break;
 
 
-#line 1283 "parser.tab.c"
+#line 1297 "parser.tab.c"
 
       default: break;
     }
@@ -1472,7 +1486,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 166 "parser.y"
+#line 168 "parser.y"
 
 
 void yyerror(const char *s) {

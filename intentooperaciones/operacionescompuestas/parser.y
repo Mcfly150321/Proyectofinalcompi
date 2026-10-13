@@ -1,6 +1,7 @@
 %code top {
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int yylex(void);
 void yyerror(const char *s);
@@ -12,6 +13,7 @@ int c_multi = 0;
 int c_divi = 0;
 int c_expo = 0;
 int c_definicion = 0;
+char tipo[20] = ""; 
 extern int linea_actual;
 }
 
@@ -92,19 +94,19 @@ definicion:
     ;
 
 comparacion:
- comparar numero NEWLINE 
- | comparar variable NEWLINE
+ comparar numero NEWLINE {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
+ | comparar variable NEWLINE {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
  ;
 
 comparar:
-    TK_MAY {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MAYOR QUE\n", linea_actual);}
-  | TK_MEN {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MENOR QUE\n", linea_actual);}
-  | TK_MAIG {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MAYOR O IGUAL\n", linea_actual);}
-  | TK_MEIG {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN MENOR O IGUAL\n", linea_actual);}
-  | TK_IG {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN IGUAL\n", linea_actual);}
-  | TK_NIG {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DISTINTO\n", linea_actual);}
+    TK_MAY {strcpy(tipo, "MAYOR QUE");}
+  | TK_MEN {strcpy(tipo, "MENOR QUE");}
+  | TK_MAIG {strcpy(tipo, "MAYOR O IGUAL");}
+  | TK_MEIG {strcpy(tipo, "MENOR O IGUAL");;}
+  | TK_IG {strcpy(tipo, "IGUAL");}
+  | TK_NIG {strcpy(tipo, "DISTINTO");}
   ;
-/*aca se usa linea actual y no linea_actual-1 porque laa impersion se realiza al procesar comparar, siin newline todavia, sigifica que no se ha actualizado la linea para ese entonces */
+/* optamos por una mejor opcion, conservamos el linea_actual-1 y el consumo de newline, y ahora en el bloque comparar se identifica el tipo*/
 suma:
      sumar operador
   ;
