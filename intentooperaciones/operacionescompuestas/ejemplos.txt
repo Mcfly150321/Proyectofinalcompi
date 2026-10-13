@@ -1,0 +1,22 @@
+5 + 3
+10 - 4
+5+3+5
+5+3-5
+5+5+a-a-c
+20 / 5
+4 * 2
+3 ** 3
+x := 12
+( 8 )
+a > b
+x < y
+a >= 10
+b <= 5
+x == y
+a <> b
+IF
+ELSE
+MAIN
+ALLOCATE
+INPUT
+OUTPUT
