@@ -20,11 +20,10 @@ int linea_actual = 1;
 "OUTPUT"    { return TK_OUTPUT; }
 "IF"        { return TK_IF; }
 "ELSE"      { return TK_ELSE; }
-"DEC"       { return TK_DEC; }
 [a-zA-Z][a-zA-Z0-9_]*  { return TK_ID; }
 ":="        { return TK_ASIG; }
 ";"         { return TK_EOS; }
-","        { return TK_COMA; }
+":"         { return TK_DP; }
 "("         { return TK_PAB; }
 ")"         { return TK_PCE; }
 ">"         { return TK_MAY; }
@@ -33,7 +32,6 @@ int linea_actual = 1;
 "<="        { return TK_MEIG; }
 "=="        { return TK_IG; }
 "<>"        { return TK_NIG; }
-"$"         { return DOLLAR; }
 "\n"        { linea_actual++; return NEWLINE; }
 [ \t\r]+    { /* ignorar espacios */ }
 .           { return yytext[0]; }

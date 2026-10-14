@@ -19,9 +19,9 @@ extern int linea_actual; /* <--- Traemos la variable desde Flex */
 %token TK_PAB TK_PCE
 %token TK_MAY TK_MEN TK_MAIG TK_MEIG TK_IG TK_NIG
 %token TK_AND TK_OR
-%token TK_ASIG TK_EOS TK_COMA
-%token TK_ALLOCATE TK_MAIN TK_INPUT TK_OUTPUT TK_IF TK_ELSE TK_DEC
-%token NEWLINE DOLLAR VACIO
+%token TK_ASIG TK_EOS TK_DP
+%token TK_ALLOCATE TK_MAIN TK_INPUT TK_OUTPUT TK_IF TK_ELSE 
+%token NEWLINE 
 
 %%
 inicio:
@@ -58,6 +58,9 @@ linea:
   | declaracion NEWLINE {
         printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual - 1);
     }
+  | declaracion { 
+        printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual - 1);
+    }
   | NEWLINE        { /* ignorar líneas vacías */ }
   | error NEWLINE  { printf(" -> LINEA %d: CADENA INVÁLIDA\n", linea_actual - 1); yyerrok; }
   ;
@@ -83,7 +86,7 @@ resta:
     restar operador
 ;
 restar:
-TK_RESTA
+    TK_RESTA
 ;
 multuplicacion:
     multiplicar operador
@@ -102,25 +105,21 @@ potenciacion:
   ;
 potenciar:
     TK_POTENCIACION
-    ;
+  ;
+
 operador:
     TK_NUMERO
   | TK_ID
-  | variable
   ;
 
 declaracion:
-    TK_DEC variable otra_variable opc_eos
+    TK_ID lista_ids TK_ALLOCATE TK_EOS
   ;
-opc_eos:
-    TK_EOS
-  | %empty
+
+lista_ids:
+    %empty
+  | TK_DP TK_ID lista_ids
   ;
-otra_variable: TK_COMA variable otra_variable
-    | %empty
-    ;
-variable:  DOLLAR TK_ID
-    ;
 
 %%
 

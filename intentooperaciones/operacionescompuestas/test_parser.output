@@ -1,0 +1,499 @@
+Terminals unused in grammar
+
+    TK_PAB
+    TK_PCE
+    TK_MAY
+    TK_MEN
+    TK_MAIG
+    TK_MEIG
+    TK_IG
+    TK_NIG
+    TK_AND
+    TK_OR
+    TK_ASIG
+    TK_MAIN
+    TK_INPUT
+    TK_OUTPUT
+    TK_IF
+    TK_ELSE
+
+
+Grammar
+
+    0 $accept: inicio $end
+
+    1 inicio: ε
+    2       | inicio linea
+
+    3 linea: operador extension NEWLINE
+    4      | declaracion NEWLINE
+    5      | NEWLINE
+    6      | error NEWLINE
+
+    7 extension: ε
+    8          | extension suma
+    9          | extension resta
+   10          | extension multuplicacion
+   11          | extension division
+   12          | extension potenciacion
+
+   13 suma: sumar operador
+
+   14 sumar: TK_SUMA
+
+   15 resta: restar operador
+
+   16 restar: TK_RESTA
+
+   17 multuplicacion: multiplicar operador
+
+   18 multiplicar: TK_MULTIPLICACION
+
+   19 division: dividir operador
+
+   20 dividir: TK_DIVISION
+
+   21 potenciacion: potenciar operador
+
+   22 potenciar: TK_POTENCIACION
+
+   23 operador: TK_NUMERO
+   24         | TK_ID
+
+   25 declaracion: TK_ID lista_ids TK_ALLOCATE TK_EOS
+
+   26 lista_ids: ε
+   27          | TK_DP TK_ID lista_ids
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256) 6
+    TK_SUMA (258) 14
+    TK_RESTA (259) 16
+    TK_DIVISION (260) 20
+    TK_MULTIPLICACION (261) 18
+    TK_POTENCIACION (262) 22
+    TK_NUMERO (263) 23
+    TK_ID (264) 24 25 27
+    TK_PAB (265)
+    TK_PCE (266)
+    TK_MAY (267)
+    TK_MEN (268)
+    TK_MAIG (269)
+    TK_MEIG (270)
+    TK_IG (271)
+    TK_NIG (272)
+    TK_AND (273)
+    TK_OR (274)
+    TK_ASIG (275)
+    TK_EOS (276) 25
+    TK_DP (277) 27
+    TK_ALLOCATE (278) 25
+    TK_MAIN (279)
+    TK_INPUT (280)
+    TK_OUTPUT (281)
+    TK_IF (282)
+    TK_ELSE (283)
+    NEWLINE (284) 3 4 5 6
+
+
+Nonterminals, with rules where they appear
+
+    $accept (30)
+        on left: 0
+    inicio (31)
+        on left: 1 2
+        on right: 0 2
+    linea (32)
+        on left: 3 4 5 6
+        on right: 2
+    extension (33)
+        on left: 7 8 9 10 11 12
+        on right: 3 8 9 10 11 12
+    suma (34)
+        on left: 13
+        on right: 8
+    sumar (35)
+        on left: 14
+        on right: 13
+    resta (36)
+        on left: 15
+        on right: 9
+    restar (37)
+        on left: 16
+        on right: 15
+    multuplicacion (38)
+        on left: 17
+        on right: 10
+    multiplicar (39)
+        on left: 18
+        on right: 17
+    division (40)
+        on left: 19
+        on right: 11
+    dividir (41)
+        on left: 20
+        on right: 19
+    potenciacion (42)
+        on left: 21
+        on right: 12
+    potenciar (43)
+        on left: 22
+        on right: 21
+    operador (44)
+        on left: 23 24
+        on right: 3 13 15 17 19 21
+    declaracion (45)
+        on left: 25
+        on right: 4
+    lista_ids (46)
+        on left: 26 27
+        on right: 25 27
+
+
+State 0
+
+    0 $accept: • inicio $end
+
+    $default  reduce using rule 1 (inicio)
+
+    inicio  go to state 1
+
+
+State 1
+
+    0 $accept: inicio • $end
+    2 inicio: inicio • linea
+
+    $end       shift, and go to state 2
+    error      shift, and go to state 3
+    TK_NUMERO  shift, and go to state 4
+    TK_ID      shift, and go to state 5
+    NEWLINE    shift, and go to state 6
+
+    linea        go to state 7
+    operador     go to state 8
+    declaracion  go to state 9
+
+
+State 2
+
+    0 $accept: inicio $end •
+
+    $default  accept
+
+
+State 3
+
+    6 linea: error • NEWLINE
+
+    NEWLINE  shift, and go to state 10
+
+
+State 4
+
+   23 operador: TK_NUMERO •
+
+    $default  reduce using rule 23 (operador)
+
+
+State 5
+
+   24 operador: TK_ID •
+   25 declaracion: TK_ID • lista_ids TK_ALLOCATE TK_EOS
+
+    TK_DP  shift, and go to state 11
+
+    TK_ALLOCATE  reduce using rule 26 (lista_ids)
+    $default     reduce using rule 24 (operador)
+
+    lista_ids  go to state 12
+
+
+State 6
+
+    5 linea: NEWLINE •
+
+    $default  reduce using rule 5 (linea)
+
+
+State 7
+
+    2 inicio: inicio linea •
+
+    $default  reduce using rule 2 (inicio)
+
+
+State 8
+
+    3 linea: operador • extension NEWLINE
+
+    $default  reduce using rule 7 (extension)
+
+    extension  go to state 13
+
+
+State 9
+
+    4 linea: declaracion • NEWLINE
+
+    NEWLINE  shift, and go to state 14
+
+
+State 10
+
+    6 linea: error NEWLINE •
+
+    $default  reduce using rule 6 (linea)
+
+
+State 11
+
+   27 lista_ids: TK_DP • TK_ID lista_ids
+
+    TK_ID  shift, and go to state 15
+
+
+State 12
+
+   25 declaracion: TK_ID lista_ids • TK_ALLOCATE TK_EOS
+
+    TK_ALLOCATE  shift, and go to state 16
+
+
+State 13
+
+    3 linea: operador extension • NEWLINE
+    8 extension: extension • suma
+    9          | extension • resta
+   10          | extension • multuplicacion
+   11          | extension • division
+   12          | extension • potenciacion
+
+    TK_SUMA            shift, and go to state 17
+    TK_RESTA           shift, and go to state 18
+    TK_DIVISION        shift, and go to state 19
+    TK_MULTIPLICACION  shift, and go to state 20
+    TK_POTENCIACION    shift, and go to state 21
+    NEWLINE            shift, and go to state 22
+
+    suma            go to state 23
+    sumar           go to state 24
+    resta           go to state 25
+    restar          go to state 26
+    multuplicacion  go to state 27
+    multiplicar     go to state 28
+    division        go to state 29
+    dividir         go to state 30
+    potenciacion    go to state 31
+    potenciar       go to state 32
+
+
+State 14
+
+    4 linea: declaracion NEWLINE •
+
+    $default  reduce using rule 4 (linea)
+
+
+State 15
+
+   27 lista_ids: TK_DP TK_ID • lista_ids
+
+    TK_DP  shift, and go to state 11
+
+    $default  reduce using rule 26 (lista_ids)
+
+    lista_ids  go to state 33
+
+
+State 16
+
+   25 declaracion: TK_ID lista_ids TK_ALLOCATE • TK_EOS
+
+    TK_EOS  shift, and go to state 34
+
+
+State 17
+
+   14 sumar: TK_SUMA •
+
+    $default  reduce using rule 14 (sumar)
+
+
+State 18
+
+   16 restar: TK_RESTA •
+
+    $default  reduce using rule 16 (restar)
+
+
+State 19
+
+   20 dividir: TK_DIVISION •
+
+    $default  reduce using rule 20 (dividir)
+
+
+State 20
+
+   18 multiplicar: TK_MULTIPLICACION •
+
+    $default  reduce using rule 18 (multiplicar)
+
+
+State 21
+
+   22 potenciar: TK_POTENCIACION •
+
+    $default  reduce using rule 22 (potenciar)
+
+
+State 22
+
+    3 linea: operador extension NEWLINE •
+
+    $default  reduce using rule 3 (linea)
+
+
+State 23
+
+    8 extension: extension suma •
+
+    $default  reduce using rule 8 (extension)
+
+
+State 24
+
+   13 suma: sumar • operador
+
+    TK_NUMERO  shift, and go to state 4
+    TK_ID      shift, and go to state 35
+
+    operador  go to state 36
+
+
+State 25
+
+    9 extension: extension resta •
+
+    $default  reduce using rule 9 (extension)
+
+
+State 26
+
+   15 resta: restar • operador
+
+    TK_NUMERO  shift, and go to state 4
+    TK_ID      shift, and go to state 35
+
+    operador  go to state 37
+
+
+State 27
+
+   10 extension: extension multuplicacion •
+
+    $default  reduce using rule 10 (extension)
+
+
+State 28
+
+   17 multuplicacion: multiplicar • operador
+
+    TK_NUMERO  shift, and go to state 4
+    TK_ID      shift, and go to state 35
+
+    operador  go to state 38
+
+
+State 29
+
+   11 extension: extension division •
+
+    $default  reduce using rule 11 (extension)
+
+
+State 30
+
+   19 division: dividir • operador
+
+    TK_NUMERO  shift, and go to state 4
+    TK_ID      shift, and go to state 35
+
+    operador  go to state 39
+
+
+State 31
+
+   12 extension: extension potenciacion •
+
+    $default  reduce using rule 12 (extension)
+
+
+State 32
+
+   21 potenciacion: potenciar • operador
+
+    TK_NUMERO  shift, and go to state 4
+    TK_ID      shift, and go to state 35
+
+    operador  go to state 40
+
+
+State 33
+
+   27 lista_ids: TK_DP TK_ID lista_ids •
+
+    $default  reduce using rule 27 (lista_ids)
+
+
+State 34
+
+   25 declaracion: TK_ID lista_ids TK_ALLOCATE TK_EOS •
+
+    $default  reduce using rule 25 (declaracion)
+
+
+State 35
+
+   24 operador: TK_ID •
+
+    $default  reduce using rule 24 (operador)
+
+
+State 36
+
+   13 suma: sumar operador •
+
+    $default  reduce using rule 13 (suma)
+
+
+State 37
+
+   15 resta: restar operador •
+
+    $default  reduce using rule 15 (resta)
+
+
+State 38
+
+   17 multuplicacion: multiplicar operador •
+
+    $default  reduce using rule 17 (multuplicacion)
+
+
+State 39
+
+   19 division: dividir operador •
+
+    $default  reduce using rule 19 (division)
+
+
+State 40
+
+   21 potenciacion: potenciar operador •
+
+    $default  reduce using rule 21 (potenciacion)

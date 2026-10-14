@@ -1,5 +1,6 @@
-DEC $a, $b;
-DEC $a, $c;
+a:b ALLOCATE;
+a ALLOCATE;
+a:b:c ALLOCATE;
 DEC a, b;
 5 + 3
 10 - 4
