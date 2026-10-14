@@ -35,9 +35,18 @@ operacion:
 linea2:
     variable seguirvariable
     | numero seguirnumero
+    | agrupacion
     | error NEWLINE { printf(" -> LINEA %d: CADENA INVÁLIDA\n", linea_actual - 1); yyerrok;}
     ;
-
+agrupacion:
+  agrupa1 operador agrupa2 NEWLINE { printf(" -> LINEA %d: CADENA VÁLIDA: AGRUPACIÓN\n", linea_actual - 1); }
+  ;
+agrupa1:
+    TK_PAB
+  ;
+agrupa2:
+    TK_PCE
+  ;
 seguirvariable:
    definicion {printf(" -> LINEA %d: CADENA VÁLIDA: DEFINICIÓN DE VARIABLE\n", linea_actual - 1);}
   | operando 
@@ -154,9 +163,6 @@ definir:
   ;
 
 /*
-
-
-
 linea:
     
     variable definicion {printf(" -> LINEA %d: CADENA VÁLIDA: DEFINICIÓN DE VARIABLE\n", linea_actual - 1);}
