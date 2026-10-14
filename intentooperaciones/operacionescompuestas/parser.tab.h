@@ -73,18 +73,19 @@ extern int yydebug;
     TK_OR = 274,                   /* TK_OR  */
     TK_ASIG = 275,                 /* TK_ASIG  */
     TK_EOS = 276,                  /* TK_EOS  */
-    TK_ALLOCATE = 277,             /* TK_ALLOCATE  */
-    TK_MAIN = 278,                 /* TK_MAIN  */
-    TK_INPUT = 279,                /* TK_INPUT  */
-    TK_OUTPUT = 280,               /* TK_OUTPUT  */
-    TK_IF = 281,                   /* TK_IF  */
-    TK_ELSE = 282,                 /* TK_ELSE  */
-    TK_FOR = 283,                  /* TK_FOR  */
-    TK_DO = 284,                   /* TK_DO  */
-    TK_BEGIN = 285,                /* TK_BEGIN  */
-    TK_TO = 286,                   /* TK_TO  */
-    TK_END = 287,                  /* TK_END  */
-    NEWLINE = 288                  /* NEWLINE  */
+    TK_DP = 277,                   /* TK_DP  */
+    TK_ALLOCATE = 278,             /* TK_ALLOCATE  */
+    TK_MAIN = 279,                 /* TK_MAIN  */
+    TK_INPUT = 280,                /* TK_INPUT  */
+    TK_OUTPUT = 281,               /* TK_OUTPUT  */
+    TK_IF = 282,                   /* TK_IF  */
+    TK_ELSE = 283,                 /* TK_ELSE  */
+    TK_FOR = 284,                  /* TK_FOR  */
+    TK_DO = 285,                   /* TK_DO  */
+    TK_BEGIN = 286,                /* TK_BEGIN  */
+    TK_TO = 287,                   /* TK_TO  */
+    TK_END = 288,                  /* TK_END  */
+    NEWLINE = 289                  /* NEWLINE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

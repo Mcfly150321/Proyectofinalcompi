@@ -28,6 +28,7 @@ int linea_actual = 1;
 "DO" {return TK_DO;}
 [a-zA-Z_][a-zA-Z0-9_]*  { return TK_ID; }
 ":="        { return TK_ASIG; }
+":"         { return TK_DP; }
 ";"         { return TK_EOS; }
 "("         { return TK_PAB; }
 ")"         { return TK_PCE; }

@@ -33,7 +33,7 @@ extern int linea_actual;
 %token TK_PAB TK_PCE
 %token TK_MAY TK_MEN TK_MAIG TK_MEIG TK_IG TK_NIG
 %token TK_AND TK_OR
-%token TK_ASIG TK_EOS
+%token TK_ASIG TK_EOS TK_DP
 %token TK_ALLOCATE TK_MAIN TK_INPUT TK_OUTPUT TK_IF TK_ELSE
 %token TK_FOR TK_DO TK_BEGIN TK_TO TK_END
 %token NEWLINE
@@ -51,6 +51,8 @@ operacion:
   | operacion definir2
   | operacion ciclofor
   | operacion condicion
+  |operacion declarar
+  |NEWLINE
   | error NEWLINE { parisopen = 0; contador = 0; contador2 = 0; printf(" CADENA INVÁLIDA\n"); yyerrok; }
   ;
 
@@ -162,7 +164,20 @@ variablefor:
 variable definir operador
 ;
 
+/*aca integrqamos la logica de declaradciones con allocate */
 
+declarar:
+declaracion {printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual);}
+|declaracion NEWLINE   {printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual - 1);}
+;
+declaracion:
+    TK_ID lista_ids TK_ALLOCATE TK_EOS
+  ;
+
+lista_ids:
+    %empty
+  | TK_DP TK_ID lista_ids
+  ;
 
 
 /*aca vienen tokens necesarios para operar con el programa */

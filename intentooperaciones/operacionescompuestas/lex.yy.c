@@ -373,8 +373,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 34
-#define YY_END_OF_BUFFER 35
+#define YY_NUM_RULES 35
+#define YY_END_OF_BUFFER 36
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -384,10 +384,10 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[76] =
     {   0,
-        0,    0,   35,   33,   32,   31,   23,   24,    5,    2,
-        3,    4,    6,    6,   33,   22,   26,   33,   25,   20,
-       20,   20,   20,   20,   20,   20,   20,   20,   20,   32,
-        1,    6,   21,   28,   30,   29,   27,   20,   20,   20,
+        0,    0,   36,   34,   33,   32,   24,   25,    5,    2,
+        3,    4,    6,    6,   22,   23,   27,   34,   26,   20,
+       20,   20,   20,   20,   20,   20,   20,   20,   20,   33,
+        1,    6,   21,   29,   31,   30,   28,   20,   20,   20,
        20,   19,   20,   20,   20,   13,   20,   20,    8,   20,
        18,   20,    7,   20,   20,   17,   15,   20,   20,   20,
        20,   20,   14,   20,   10,   20,   20,   16,   11,   20,
@@ -493,10 +493,10 @@ static const flex_int16_t yy_chk[120] =
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[35] =
+static const flex_int32_t yy_rule_can_match_eol[36] =
     {   0,
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,     };
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -911,70 +911,75 @@ YY_RULE_SETUP
 case 22:
 YY_RULE_SETUP
 #line 31 "lexer.l"
-{ return TK_EOS; }
+{ return TK_DP; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 32 "lexer.l"
-{ return TK_PAB; }
+{ return TK_EOS; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 33 "lexer.l"
-{ return TK_PCE; }
+{ return TK_PAB; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 34 "lexer.l"
-{ return TK_MAY; }
+{ return TK_PCE; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 35 "lexer.l"
-{ return TK_MEN; }
+{ return TK_MAY; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 36 "lexer.l"
-{ return TK_MAIG; }
+{ return TK_MEN; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 37 "lexer.l"
-{ return TK_MEIG; }
+{ return TK_MAIG; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 38 "lexer.l"
-{ return TK_IG; }
+{ return TK_MEIG; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 39 "lexer.l"
-{ return TK_NIG; }
+{ return TK_IG; }
 	YY_BREAK
 case 31:
-/* rule 31 can match eol */
 YY_RULE_SETUP
 #line 40 "lexer.l"
-{ linea_actual++; return NEWLINE; }
+{ return TK_NIG; }
 	YY_BREAK
 case 32:
+/* rule 32 can match eol */
 YY_RULE_SETUP
 #line 41 "lexer.l"
-{ /* ignorar espacios */ }
+{ linea_actual++; return NEWLINE; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 42 "lexer.l"
-{ return yytext[0]; }
+{ /* ignorar espacios */ }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 44 "lexer.l"
+#line 43 "lexer.l"
+{ return yytext[0]; }
+	YY_BREAK
+case 35:
+YY_RULE_SETUP
+#line 45 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 977 "lex.yy.c"
+#line 982 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1991,7 +1996,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 44 "lexer.l"
+#line 45 "lexer.l"
 
 
 
