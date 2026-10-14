@@ -14,6 +14,8 @@ int c_divi = 0;
 int c_expo = 0;
 int c_definicion = 0;
 char tipo[20] = ""; 
+int iniciofor = 0;
+int finfor = 0;
 extern int linea_actual;
 }
 
@@ -24,19 +26,26 @@ extern int linea_actual;
 %token TK_AND TK_OR
 %token TK_ASIG TK_EOS
 %token TK_ALLOCATE TK_MAIN TK_INPUT TK_OUTPUT TK_IF TK_ELSE
+%token TK_FOR TK_DO TK_BEGIN TK_TO TK_END
 %token NEWLINE
+
+%start arranque
 
 %%
 
+arranque:
+    operacion
+  ;
 operacion:
     %empty
   | operacion linea2
+  | operacion ciclofor
+    | error NEWLINE { printf(" CADENA INVÁLIDA\n"); yyerrok; }
   ;
 linea2:
     variable seguirvariable
     | numero seguirnumero
     | agrupacion
-    | error NEWLINE { printf(" -> LINEA %d: CADENA INVÁLIDA\n", linea_actual - 1); yyerrok;}
     ;
 agrupacion:
   agrupa1 operador agrupa2 NEWLINE { printf(" -> LINEA %d: CADENA VÁLIDA: AGRUPACIÓN\n", linea_actual - 1); }
@@ -58,6 +67,57 @@ seguirnumero:
     | comparacion NEWLINE {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
   
   ;
+
+eos:
+TK_EOS
+;
+for:
+TK_FOR
+;
+do:
+TK_DO
+;
+begin:
+TK_BEGIN
+;
+to:
+TK_TO
+;
+end:
+TK_END
+;
+
+ciclofor:
+bloque1 bloque2 bloque3 fin {printf(" -> LINEAS %d-%d : CADENA VÁLIDA: CICLO FOR\n", iniciofor, finfor);}
+;
+
+bloque1:
+for iniciar to operador do NEWLINE {iniciofor=linea_actual-1;}
+;
+bloque2:
+begin NEWLINE 
+;
+
+bloque3:
+instrucciones
+;
+
+fin:
+end {finfor=linea_actual;}
+|end NEWLINE {finfor=linea_actual-1;}
+;
+
+iniciar:
+variable definir operador
+;
+
+instrucciones:
+variable definir nuevovalor eos NEWLINE
+;
+
+nuevovalor:
+numero 
+;
 
 operando:
  { contador = 0; c_suma=0; c_resta=0; c_multi=0; c_divi=0; c_expo=0;} extension NEWLINE {
@@ -160,6 +220,7 @@ potenciacion:
   ;
 potenciar:
     TK_POTENCIACION
+  ;
 operador:
     variable
   | numero
@@ -178,7 +239,9 @@ definir:
 %%
 
 void yyerror(const char *s) {
-    /* Manejo discreto del error */
+   extern int yylineno;
+    extern char *yytext;
+   fprintf(stderr, " -> LINEA %i: Error cerca de %s, ", yylineno, yytext);
 }
 
 int main(void) {

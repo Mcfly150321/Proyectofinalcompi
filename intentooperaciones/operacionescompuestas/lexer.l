@@ -4,6 +4,7 @@ int linea_actual = 1;
 %}
 
 %option noyywrap
+%option yylineno
 
 %%
 "**"        { return TK_POTENCIACION; }
@@ -20,6 +21,11 @@ int linea_actual = 1;
 "OUTPUT"    { return TK_OUTPUT; }
 "IF"        { return TK_IF; }
 "ELSE"      { return TK_ELSE; }
+"FOR" {return TK_FOR; }
+"BEGIN" {return TK_BEGIN;}
+"END" {return TK_END;}
+"TO" {return TK_TO;}
+"DO" {return TK_DO;}
 [a-zA-Z_][a-zA-Z0-9_]*  { return TK_ID; }
 ":="        { return TK_ASIG; }
 ";"         { return TK_EOS; }
