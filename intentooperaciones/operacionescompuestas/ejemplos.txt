@@ -7,7 +7,9 @@
 4 * 2
 3 ** 3
 x := 12
-( 8 )
+(5+3+5)
+(5)
+(a > b AND c < d)
 a > b
 5 < C
 1<2
@@ -30,4 +32,34 @@ FOR i := 1 TO 7 DO
 BEGIN
 total := 1;
 total2 := 3;
+total3 := total3 + 1 + 2 + valor2;
 END
+x := 5
+y := 99
+z := 0
+(10 / 2)
+(3 ** 2)
+(a + b - c)
+(x * y)
+(1 == 1)
+(a <> b)
+(a > b AND c < d OR x == y)
+x > y AND y > z AND z == 0
+a == b AND c == d
+1 > 2
+0 < 1
+FOR x := 0 TO 10 DO
+BEGIN
+result := 5;
+END
+FOR contador := 1 TO 100 DO
+BEGIN
+suma := 0;
+resta := 1;
+multi := 2;
+END
+x +
++ 3
+:= 5
+( )
+(( a ))

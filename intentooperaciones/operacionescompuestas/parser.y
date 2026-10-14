@@ -16,6 +16,7 @@ int c_definicion = 0;
 char tipo[20] = ""; 
 int iniciofor = 0;
 int finfor = 0;
+int parisopen=0;
 extern int linea_actual;
 }
 
@@ -38,34 +39,44 @@ arranque:
   ;
 operacion:
     %empty
-  | operacion linea2
+  | operacion expresion
   | operacion ciclofor
-    | error NEWLINE { printf(" CADENA INVÁLIDA\n"); yyerrok; }
+  | operacion condicion
+    | error NEWLINE{ printf(" CADENA INVÁLIDA\n"); yyerrok; }
   ;
+
+expresion:
+linea2
+|linea2 NEWLINE
+;
 linea2:
     variable seguirvariable
     | numero seguirnumero
-    | agrupacion
     ;
-agrupacion:
-  agrupa1 operador agrupa2 NEWLINE { printf(" -> LINEA %d: CADENA VÁLIDA: AGRUPACIÓN\n", linea_actual - 1); }
+condicion:
+  agrupa1 expresion agrupa2 NEWLINE { printf(" -> LINEA %d: CADENA VÁLIDA: AGRUPACIÓN DE CONDICION\n", linea_actual - 1); }
   ;
 agrupa1:
-    TK_PAB
+    TK_PAB {parisopen++;}
   ;
 agrupa2:
-    TK_PCE
+    TK_PCE {parisopen--;}
   ;
 seguirvariable:
-   definicion {printf(" -> LINEA %d: CADENA VÁLIDA: DEFINICIÓN DE VARIABLE\n", linea_actual - 1);}
-  | operando 
-  | comparacion NEWLINE {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
-  ;
+   definicion {printf(" -> LINEA %d: CADENA VÁLIDA: DEFINICIÓN DE VARIABLE\n", linea_actual);}
+  | operando
+  | comparacion {if (parisopen== 0 ){
+    {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
+    }
+  }
+   ;
 
 seguirnumero:
-    operando 
-    | comparacion NEWLINE {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
-  
+    operando
+    | comparacion  {if (parisopen== 0 ){
+    {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
+    }
+  }
   ;
 
 eos:
@@ -121,35 +132,36 @@ variable definir nuevovalor eos NEWLINE
 ;
 
 nuevovalor:
-numero 
+numero
+|larga extension
 ;
 
 operando:
- { contador = 0; c_suma=0; c_resta=0; c_multi=0; c_divi=0; c_expo=0;} extension NEWLINE {
+ { contador = 0; c_suma=0; c_resta=0; c_multi=0; c_divi=0; c_expo=0;} extension {
         int l = linea_actual - 1; 
-        
+        if (parisopen== 0 ){
         if (contador == 1 && c_suma == 1) {
-            printf(" -> LINEA %d: CADENA VÁLIDA: SUMA SIMPLE\n", l);
+            printf(" -> LINEA %d: CADENA VÁLIDA: SUMA SIMPLE\n", linea_actual-1);
         } 
         else if (contador == 1 && c_resta == 1) {
-            printf(" -> LINEA %d: CADENA VÁLIDA: RESTA SIMPLE\n", l);
+            printf(" -> LINEA %d: CADENA VÁLIDA: RESTA SIMPLE\n", linea_actual-1);
         } 
         else if (contador == 1 && c_multi == 1) {
-            printf(" -> LINEA %d: CADENA VÁLIDA: MULTIPLICACIÓN SIMPLE\n", l);
+            printf(" -> LINEA %d: CADENA VÁLIDA: MULTIPLICACIÓN SIMPLE\n", linea_actual-1);
         } 
         else if (contador == 1 && c_divi == 1) {
-            printf(" -> LINEA %d: CADENA VÁLIDA: DIVISIÓN SIMPLE\n", l);
+            printf(" -> LINEA %d: CADENA VÁLIDA: DIVISIÓN SIMPLE\n", linea_actual-1);
         } 
         else if (contador == 1 && c_expo == 1) {
-            printf(" -> LINEA %d: CADENA VÁLIDA: POTENCIACIÓN SIMPLE\n", l);
+            printf(" -> LINEA %d: CADENA VÁLIDA: POTENCIACIÓN SIMPLE\n", linea_actual-1);
         }
         else if (contador > 1) {
-            printf(" -> LINEA %d: CADENA VÁLIDA: OPERACIÓN COMPUESTA (Contador: %d)\n", l, contador);
+            printf(" -> LINEA %d: CADENA VÁLIDA: OPERACIÓN COMPUESTA (Contador: %d)\n", linea_actual-1, contador);
         } 
         else {
-            printf(" -> LINEA %d: CADENA VÁLIDA: SOLO UN OPERANDO SUELTO\n", l);
+            printf(" -> LINEA %d: CADENA VÁLIDA: SOLO UN OPERANDO SUELTO\n", linea_actual-1);
         }
-
+}
     } 
         ;
 
@@ -164,7 +176,7 @@ extension:
   
 
 definicion:
-    definir numero NEWLINE{
+    definir numero{
         c_definicion++;
     }
     ;
@@ -240,7 +252,13 @@ numero:
 definir:
     TK_ASIG
   ;
-
+larga:
+operador sumar operador
+| operador restar operador
+|operador multiplicar operador
+|operador dividir operador
+|operador potenciar operador
+;
 %%
 
 void yyerror(const char *s) {
