@@ -9,11 +9,17 @@
 x := 12
 ( 8 )
 a > b
+5 < C
+1<2
+1==2
 x < y
 a >= 10
 b <= 5
 x == y
 a <> b
+a > b AND c < d
+a > b OR c == 10
+a > b AND c < d OR x == y
 IF
 ELSE
 MAIN

@@ -50,11 +50,13 @@ agrupa2:
 seguirvariable:
    definicion {printf(" -> LINEA %d: CADENA VÁLIDA: DEFINICIÓN DE VARIABLE\n", linea_actual - 1);}
   | operando 
-  | comparacion
+  | comparacion NEWLINE {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
   ;
 
 seguirnumero:
     operando 
+    | comparacion NEWLINE {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
+  
   ;
 
 operando:
@@ -101,11 +103,22 @@ definicion:
         c_definicion++;
     }
     ;
-
+/*originalmente el newline esta definido hasta el bloque comparar, quuizas convendria, para usar comparacion en  otras partes, mover el newline
+al bloque de segurvariable por temas de que la comparacuon consuma la sentencia de comparaciion sin precisar saltos de linea */
 comparacion:
- comparar numero NEWLINE {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
- | comparar variable NEWLINE {printf(" -> LINEA %d: CADENA VÁLIDA: COMPARACIÓN DEL TIPO %s\n", linea_actual-1, tipo);}
+ comparar operador extender
  ;
+
+
+extender:
+    %empty
+  | extensor operador comparar operador extender {strcpy(tipo, "CONDICION COMPUESTA");}
+  ;
+
+extensor:
+TK_AND
+| TK_OR
+;
 
 comparar:
     TK_MAY {strcpy(tipo, "MAYOR QUE");}
@@ -162,15 +175,6 @@ definir:
     TK_ASIG
   ;
 
-/*
-linea:
-    
-    variable definicion {printf(" -> LINEA %d: CADENA VÁLIDA: DEFINICIÓN DE VARIABLE\n", linea_actual - 1);}
-    |
-  | NEWLINE        { }
-  | error NEWLINE  { printf(" -> LINEA %d: CADENA INVÁLIDA\n", linea_actual - 1); yyerrok; }
-  ;
-*/
 %%
 
 void yyerror(const char *s) {
