@@ -29,4 +29,5 @@ OUTPUT
 FOR i := 1 TO 7 DO
 BEGIN
 total := 1;
+total2 := 3;
 END

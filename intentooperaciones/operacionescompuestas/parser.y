@@ -99,8 +99,13 @@ begin NEWLINE
 ;
 
 bloque3:
-instrucciones
+instrucciones masinstrucciones
 ;
+
+masinstrucciones:
+    %empty
+  | masinstrucciones instrucciones
+  ;
 
 fin:
 end {finfor=linea_actual;}
