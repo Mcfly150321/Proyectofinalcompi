@@ -99,3 +99,31 @@ a::b ALLOCATE;
 x := ;
 (a > )
 +
+
+DO
+     total := total + 1;
+     total := total + 1;
+WHILE(x < 25 AND x >0)
+(x < 25 AND x >0)
+DO
+     contador := 0;
+WHILE(contador < 10)
+DO
+     suma := suma + k * 2;
+     k := k + 1;
+     temp := 100 - k;
+WHILE(k <= limit AND suma < 1000)
+DO
+     x := x - 1;
+     y := y + 2;
+WHILE(x > 0 AND y < 50 OR flag == 1)
+DO
+     intentos := intentos + 1;
+     status := 0;
+WHILE(status <> 1 AND intentos <= maximo)
+DO
+     a := a * 2 + b - 1;
+     b := b / 2;
+     c := c ** 2;
+     d := 0;
+WHILE(a >= 0 AND b >= 0)

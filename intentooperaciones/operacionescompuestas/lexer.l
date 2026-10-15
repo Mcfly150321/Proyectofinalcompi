@@ -26,6 +26,7 @@ int linea_actual = 1;
 "END" {return TK_END;}
 "TO" {return TK_TO;}
 "DO" {return TK_DO;}
+"WHILE" {return TK_WHILE;}
 [a-zA-Z_][a-zA-Z0-9_]*  { return TK_ID; }
 ":="        { return TK_ASIG; }
 ":"         { return TK_DP; }
@@ -41,6 +42,14 @@ int linea_actual = 1;
 "\n"        { linea_actual++; return NEWLINE; }
 [ \t\r]+    { /* ignorar espacios */ }
 .           { return yytext[0]; }
-
+<<EOF>> {
+    static int enviado = 0;
+    if (!enviado) {
+        enviado = 1;
+        linea_actual++;   
+        return NEWLINE;
+    }
+    yyterminate();
+}
 %%
 

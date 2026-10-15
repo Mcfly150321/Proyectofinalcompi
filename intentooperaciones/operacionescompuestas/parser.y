@@ -7,6 +7,7 @@ int yylex(void);
 void yyerror(const char *s);
 void imprimir_aritmetica(void);
 void imprimir_logica(void);
+void imprimir_condicion(void);
 
 int contador = 0;
 int contador2=0;
@@ -25,6 +26,9 @@ char tipologica[20]="";
 int iniciofor = 0;
 int finfor = 0;
 int parisopen=0;
+int whileopen=0;
+int iniciowhile=0;
+int finwhile=0;
 extern int linea_actual;
 }
 
@@ -35,7 +39,7 @@ extern int linea_actual;
 %token TK_AND TK_OR
 %token TK_ASIG TK_EOS TK_DP
 %token TK_ALLOCATE TK_MAIN TK_INPUT TK_OUTPUT TK_IF TK_ELSE
-%token TK_FOR TK_DO TK_BEGIN TK_TO TK_END
+%token TK_FOR TK_DO TK_BEGIN TK_TO TK_END TK_WHILE
 %token NEWLINE
 
 %start inicio
@@ -50,10 +54,11 @@ operacion:
   | operacion expresion
   | operacion definir2
   | operacion ciclofor
-  | operacion condicion
-  |operacion declarar
-  |NEWLINE
-  | error NEWLINE { parisopen = 0; contador = 0; contador2 = 0; printf(" CADENA INVÁLIDA\n"); yyerrok; }
+  | operacion condicionar
+  | operacion declarar
+  | operacion dowhile
+  | operacion NEWLINE
+  | error NEWLINE { parisopen = 0; contador = 0; contador2 = 0; whileopen=0; printf(" CADENA INVÁLIDA\n"); yyerrok; }
   ;
 
 
@@ -115,8 +120,11 @@ definicion:
 
 
 /*aca viene la logica de las condicones entre parentesis */
+condicionar:
+ condicion NEWLINE {imprimir_condicion();}
+ ;
 condicion:
-  agrupa1 logica agrupa2 NEWLINE { contador2=0; printf(" -> LINEA %d: CADENA VÁLIDA: AGRUPACIÓN DE CONDICION\n", linea_actual - 1); }
+  agrupa1 logica agrupa2 {    contador2=0; }
   ;
 agrupa1:
     TK_PAB {parisopen++;}
@@ -143,6 +151,36 @@ arriba, con la logica con la que extendemops las operaciones las instruccuiones 
 eso no afecta nada perio para lleavr una logica prolija no estaria de mas estandarizar todo*/
 ;
 
+fin:
+end NEWLINE {finfor=linea_actual-1;}
+;
+
+variablefor:
+variable definir operador
+;
+
+
+/*ahora la logica del dowhile */
+
+
+dowhile:
+bloque1dw bloque2dw bloque3dw { {printf(" -> LINEAS %d-%d : CADENA VÁLIDA: CICLO DOWHILE\n", iniciowhile, finwhile);}}
+;
+
+bloque1dw:
+do NEWLINE {whileopen++; iniciowhile=linea_actual-1;}
+;
+
+bloque2dw:
+instrucciones masinstrucciones
+;
+
+bloque3dw:
+ while condicion NEWLINE {finwhile=linea_actual-1; whileopen--;}
+;
+
+/*bloque utilm tanto para for como para while */
+
 instrucciones:
 variable definir nuevovalor eos NEWLINE { contador = 0; }
 ;
@@ -155,29 +193,20 @@ masinstrucciones:
   | masinstrucciones instrucciones
   ;
 
-fin:
-end {finfor=linea_actual;}
-|end NEWLINE {finfor=linea_actual-1;}
-;
-
-variablefor:
-variable definir operador
-;
-
 /*aca integrqamos la logica de declaradciones con allocate */
 
 declarar:
-declaracion {printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual);}
-|declaracion NEWLINE   {printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual - 1);}
+declaracion NEWLINE   {printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual - 1);}
 ;
 declaracion:
-    TK_ID lista_ids TK_ALLOCATE TK_EOS
+    variable lista_ids allocate TK_EOS
   ;
 
 lista_ids:
     %empty
-  | TK_DP TK_ID lista_ids
+  | TK_DP variable lista_ids
   ;
+
 
 
 /*aca vienen tokens necesarios para operar con el programa */
@@ -229,12 +258,15 @@ operador:
     variable
   | numero
   ;
-
-
-/* se comentan porque no se van a usar todavia 
 allocate:
 TK_ALLOCATE 
 ;
+while:
+TK_WHILE
+;
+
+/* se comentan porque no se van a usar todavia 
+
 main:
 TK_MAIN
 ;
@@ -407,6 +439,12 @@ void imprimir_logica(void) {
         }
     }
     contador2 = 0; 
+}
+
+void imprimir_condicion(void){
+if(whileopen==0){
+printf(" -> LINEA %d: CADENA VÁLIDA: AGRUPACIÓN DE CONDICION\n", linea_actual - 1);
+}
 }
 
 int main(void) {
