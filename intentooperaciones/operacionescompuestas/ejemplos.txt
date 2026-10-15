@@ -127,3 +127,31 @@ DO
      c := c ** 2;
      d := 0;
 WHILE(a >= 0 AND b >= 0)
+IF (X==15)
+  c := c ** 2;
+d := 0;
+ELSE
+     d := 0;
+END
+IF (X==15)
+  c := c ** 2;
+d := 0;
+ELSE IF (X>=11)
+     d := 0;
+ELSE
+    D := 15;
+END
+IF (X==15)
+  c := c ** 2;
+d := 0;
+ELSE IF (X>=11)
+     d := 0;
+END
+IF (X==15)
+  c := c ** 2;
+d := 0;
+END
+IF (X==15)
+  c := c ** 2;
+d := 0;
+END

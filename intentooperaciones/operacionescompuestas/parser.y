@@ -29,6 +29,9 @@ int parisopen=0;
 int whileopen=0;
 int iniciowhile=0;
 int finwhile=0;
+int inicioif=0;
+int finif=0;
+int ifopen=0;
 extern int linea_actual;
 }
 
@@ -58,7 +61,8 @@ operacion:
   | operacion declarar
   | operacion dowhile
   | operacion NEWLINE
-  | error NEWLINE { parisopen = 0; contador = 0; contador2 = 0; whileopen=0; printf(" CADENA INVÁLIDA\n"); yyerrok; }
+  | operacion cicloif
+  | error NEWLINE { parisopen = 0; contador = 0; contador2 = 0; whileopen=0; ifopen=0; printf(" CADENA INVÁLIDA\n"); yyerrok; }
   ;
 
 
@@ -179,6 +183,25 @@ bloque3dw:
  while condicion NEWLINE {finwhile=linea_actual-1; whileopen--;}
 ;
 
+cicloif:
+if1 if2 if3 if4 {printf("-> LINEAS %d-%d: CADENA VALIDA: CICLO IF\n", inicioif, finif);}
+;
+if1:
+if condicion NEWLINE {inicioif=linea_actual-1; ifopen++;}
+;
+
+if2:
+instrucciones masinstrucciones
+;
+
+if3:
+%empty 
+|else if condicion NEWLINE if2 if3
+| else NEWLINE if2
+;
+if4:
+end {finif=linea_actual; ifopen--;}
+;
 /*bloque utilm tanto para for como para while */
 
 instrucciones:
@@ -199,18 +222,27 @@ declarar:
 declaracion NEWLINE   {printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual - 1);}
 ;
 declaracion:
-    variable lista_ids allocate TK_EOS
+    variable lista_ids allocate eos
   ;
 
 lista_ids:
     %empty
-  | TK_DP variable lista_ids
+  | dospuntos variable lista_ids
   ;
 
 
 
 /*aca vienen tokens necesarios para operar con el programa */
 
+if:
+TK_IF
+;
+else:
+TK_ELSE
+;
+dospuntos:
+TK_DP
+;
 eos:
 TK_EOS
 ;
@@ -275,12 +307,6 @@ TK_INPUT
 ;
 output: 
 TK_OUTPUT
-;
-if:
-TK_IF
-;
-else:
-TK_ELSE
 ;
 
 
