@@ -113,7 +113,10 @@ expresion:
 
 
 aritmetica:
-operador simarit operador otraaritmetica eos
+ oparit eos
+;
+oparit:
+operador simarit operador otraaritmetica
 ;
 otraaritmetica:
 %empty 
@@ -220,7 +223,7 @@ cicloif:
     ;
 
 if_encabezado:
-    if condicion then NEWLINE { $$ = linea_actual - 1; ifopen++; }
+    if condicion then NEWLINE { $$ = linea_actual - 1; ifopen++; } /*investigamos que $$ es oara guardar en pila una variable, especialmente nos sirve para validar ifs anidados y saber en que linea van porque inician muchos nuevos contadores */
     ;
 
 cuerpo_instrucciones:
@@ -326,6 +329,10 @@ definir:
     TK_ASIG
   ;
 operador:
+factores
+| agrupa1 factores simarit factores otraaritmetica agrupa2
+;
+factores:
     variable
   | numero
   ;

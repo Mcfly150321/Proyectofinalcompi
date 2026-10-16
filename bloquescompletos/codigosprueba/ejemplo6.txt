@@ -1,7 +1,9 @@
 MAIN ***hola***
  BEGIN
+
     a:b:c:max ALLOCATE;
     INPUT a;
+     (a/b)
     INPUT b;
     INPUT c;
     IF (a > b) THEN
