@@ -1,0 +1,44 @@
+
+MAIN
+BEGIN
+    v1:v2:v3:v4:v5:res:i ALLOCATE;
+    
+    *** Lecturas multiples y asignaciones con numeros negativos y potencia ***
+    INPUT v1;
+    INPUT v2;
+    INPUT v3;
+    
+    v4 := -2 ** 3;
+    v5 := 15 + v1 * v2 / v3 - 1;
+    
+    *** Bloque IF anidado obligatorio con condiciones compuestas (AND / OR / <> / ==) ***
+    IF (v1 < v2 AND v3 >= 0 OR v4 <> 10) THEN
+    BEGIN
+        IF (v5 == 0) THEN
+        BEGIN
+            res := 100;
+        END
+        ELSE
+        BEGIN
+            res := v5 + 50;
+        END
+    END
+    ELSE
+    BEGIN
+        res := 0;
+    END
+    
+    *** Bucle DO-WHILE con multiples sentencias dentro ***
+    DO
+        res := res - 1;
+        v1 := v1 + 1;
+    WHILE (v1 < 10 AND res > 5)
+    
+    *** Bucle FOR con limite superior dinamico (variable) ***
+    FOR i := 1 to v2 do
+    BEGIN
+        res := res + i;
+    END
+    
+    OUTPUT res;
+END

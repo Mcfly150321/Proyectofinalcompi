@@ -1,0 +1,30 @@
+MAIN ***hola***
+ BEGIN
+    a:b:c:max ALLOCATE;
+    INPUT a;
+    INPUT b;
+    INPUT c;
+    IF (a > b) THEN
+    BEGIN
+        IF (a > c) THEN
+        BEGIN
+            OUTPUT a;
+        END
+        ELSE
+        BEGIN
+            max := 3;
+        END
+    END
+    ELSE
+    BEGIN
+        IF (b > c) THEN
+        BEGIN
+            max := 3;
+        END
+        ELSE
+        BEGIN
+            max := c;
+        END
+    END
+    OUTPUT max;
+ END

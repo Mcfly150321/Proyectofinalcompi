@@ -12,7 +12,7 @@ int linea_actual = 1;
 "-"         { return TK_RESTA; }
 "/"         { return TK_DIVISION; }
 "*"         { return TK_MULTIPLICACION; }
-0|([1-9][0-9]*)      { return TK_NUMERO; }
+-?(?:0|[1-9][0-9]*)  { return TK_NUMERO; }
 "AND"       { return TK_AND; }
 "OR"        { return TK_OR; }
 "ALLOCATE"  { return TK_ALLOCATE; }
@@ -24,10 +24,11 @@ int linea_actual = 1;
 "FOR" {return TK_FOR; }
 "BEGIN" {return TK_BEGIN;}
 "END" {return TK_END;}
-"TO" {return TK_TO;}
-"DO" {return TK_DO;}
+"TO"|"to" {return TK_TO;}
+"DO"|"do" {return TK_DO;}
 "THEN" {return TK_THEN;}
 "WHILE" {return TK_WHILE;}
+\*{3}([^*]|\*[^*]|\*\*[^*])*\*{3} {return TK_COMENTARIO;}
 [a-zA-Z_][a-zA-Z0-9_]*  { return TK_ID; }
 ":="        { return TK_ASIG; }
 ":"         { return TK_DP; }

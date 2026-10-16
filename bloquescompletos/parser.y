@@ -48,6 +48,7 @@ extern int linea_actual;
 %token TK_ASIG TK_EOS TK_DP
 %token TK_ALLOCATE TK_MAIN TK_INPUT TK_OUTPUT TK_THEN TK_IF TK_ELSE
 %token TK_FOR TK_DO TK_BEGIN TK_TO TK_END TK_WHILE
+%token TK_COMENTARIO
 %token NEWLINE
 
 %start inicio3
@@ -81,9 +82,11 @@ operacion:
   | operacion cicloif
   | operacion lectura
   | operacion impresion
+  | operacion comentario
   ;
-
-
+comentario:
+TK_COMENTARIO {printf(" -> LINEA %d: CADENA VÁLIDA: comentario\n", linea_actual - 1);}
+;
 lectura:
 leer NEWLINE {imprimir_in();}
 leer:
@@ -152,7 +155,7 @@ definir2:
 definicion NEWLINE
 ;
 definicion:
-    variable definir numero eos{
+    variable definir operador eos{
       imprimir_defnum();/*voy a quytar el contador de definciones porqe no me esta sirviendo */
     }
     |variable definir aritmetica {
@@ -212,12 +215,12 @@ bloque3dw:
 cicloif:
     if_encabezado bloque_begin_end if_ramas {
         ifopen--;
-        printf("-> LINEAS %d-%d: CADENA VALIDA: CICLO IF\n", inicioif, finif);
+        printf("-> LINEAS %d-%d: CADENA VALIDA: CICLO IF\n", $1, finif);
     }
     ;
 
 if_encabezado:
-    if condicion then NEWLINE { inicioif = linea_actual - 1; ifopen++; }
+    if condicion then NEWLINE { $$ = linea_actual - 1; ifopen++; }
     ;
 
 cuerpo_instrucciones:
@@ -236,6 +239,7 @@ instrucciones:
 definicion { contador = 0; }
 | lectura {contador=0;}
 |impresion {contador=0;}
+|cicloif
 ;
 
 masinstrucciones:
@@ -523,7 +527,7 @@ void imprimir_out(void){
 void imprimir_defnum(){
   if (whileopen==0 && foropen==0 && thenopen==0)
   {
-   printf(" -> LINEA %d: CADENA VÁLIDA: DEFINICIÓN DE VARIABLE A NUMERO\n", linea_actual);
+   printf(" -> LINEA %d: CADENA VÁLIDA: DEFINICIÓN DE VARIABLE A NUMERO/VARIABLE\n", linea_actual);
   }
 }
 void imprimir_defop(){
