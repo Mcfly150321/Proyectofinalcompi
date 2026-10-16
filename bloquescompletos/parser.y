@@ -330,7 +330,7 @@ definir:
   ;
 operador:
 factores
-| agrupa1 factores simarit factores otraaritmetica agrupa2
+| agrupa1 operador simarit operador otraaritmetica agrupa2
 ;
 factores:
     variable
