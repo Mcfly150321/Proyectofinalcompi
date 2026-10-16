@@ -1,0 +1,41 @@
+MAIN
+ BEGIN
+   a:b ALLOCATE;
+   INPUT b;
+   OUTPUT a; 
+   z:=x+y;
+  INPUT a;
+FOR x := 0 TO 10 DO
+BEGIN
+INPUT b;
+
+OUTPUT b;
+
+
+END
+
+
+
+DO
+     OUTPUT c;
+    a:=5+b;
+
+WHILE(status <> 1 AND intentos <= maximo)
+
+IF(x<y) THEN
+      BEGIN
+          z:=x+y;
+          INPUT a;
+      END
+    ELSE IF(x<y) THEN
+      BEGIN
+          z:=0;
+
+      END
+    ELSE
+      BEGIN
+          z:=0;
+      END 
+
+      
+END
