@@ -55,7 +55,7 @@ extern int linea_actual;
 %precedence NEWLINE
 
 %start programa
-
+%expect 1
 %%
 programa:
 opt_inicio bloque
@@ -263,7 +263,7 @@ masinstrucciones:
 /*bloque para for y para if */
 
 bloque_begin_end:
-    begin opt_nl cuerpo_instrucciones end{ finif = linea_actual; finfor=linea_actual; foropen=0; whileopen=0; ifopen=0;}
+    begin opt_nl cuerpo_instrucciones end opt_nl { finif = linea_actual; finfor=linea_actual; foropen=0; whileopen=0; ifopen=0;}
     ;
 
 /*aca integrqamos la logica de declaradciones con allocate */
@@ -294,7 +294,6 @@ TK_IF { $$ = linea_actual; }
 ;
 else:
     TK_ELSE {thenopen=1;}
-  | NEWLINE else
   ;
 dospuntos:
 TK_DP
