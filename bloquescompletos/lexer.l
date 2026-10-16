@@ -12,7 +12,7 @@ int linea_actual = 1;
 "-"         { return TK_RESTA; }
 "/"         { return TK_DIVISION; }
 "*"         { return TK_MULTIPLICACION; }
--?(?:0|[1-9][0-9]*)  { return TK_NUMERO; }
+0|[1-9][0-9]*  { return TK_NUMERO; }
 "AND"       { return TK_AND; }
 "OR"        { return TK_OR; }
 "ALLOCATE"  { return TK_ALLOCATE; }

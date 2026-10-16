@@ -88,7 +88,8 @@ extern int yydebug;
     TK_END = 289,                  /* TK_END  */
     TK_WHILE = 290,                /* TK_WHILE  */
     TK_COMENTARIO = 291,           /* TK_COMENTARIO  */
-    NEWLINE = 292                  /* NEWLINE  */
+    NEWLINE = 292,                 /* NEWLINE  */
+    REDUCE_NO_ELSE = 293           /* REDUCE_NO_ELSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

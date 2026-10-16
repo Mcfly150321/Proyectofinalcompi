@@ -51,21 +51,28 @@ extern int linea_actual;
 %token TK_COMENTARIO
 %token NEWLINE
 
+%precedence REDUCE_NO_ELSE
+%precedence NEWLINE
+
 %start inicio3
 
 %%
 inicio3:
-opt_newline inicio2
+opt_inicio inicio2
 ;
 inicio2:
-    TK_MAIN NEWLINE TK_BEGIN NEWLINE inicio TK_END opt_newline {
+    TK_MAIN opt_inicio TK_BEGIN inicio TK_END opt_inicio{
         printf("\nBloque valido codigo completo\n");
     }
-  | error NEWLINE { parisopen = 0; contador = 0; contador2 = 0; whileopen=0; ifopen=0; foropen=0; thenopen=0; printf(" CADENA INVÁLIDA\n"); yyerrok; }
-  ;
-opt_newline:
+opt_inicio:
     %empty
-  | opt_newline NEWLINE
+  | opt_inicio NEWLINE
+  | opt_inicio comentario
+  ;
+
+opt_nl:
+    %empty
+  | opt_nl NEWLINE
   ;
 inicio:
     operacion
@@ -73,7 +80,7 @@ inicio:
 operacion:
     %empty
   | operacion expresion
-  | operacion definir2
+  | operacion definicion
   | operacion ciclofor
   | operacion condicionar
   | operacion declarar
@@ -85,15 +92,15 @@ operacion:
   | operacion comentario
   ;
 comentario:
-TK_COMENTARIO {printf(" -> LINEA %d: CADENA VÁLIDA: comentario\n", linea_actual - 1);}
+TK_COMENTARIO {printf(" -> LINEA %d: CADENA VÁLIDA: comentario\n", linea_actual);}
 ;
 lectura:
-leer NEWLINE {imprimir_in();}
+leer {imprimir_in();}
 leer:
 input variable eos
 ;
 impresion:
-imprimir NEWLINE{imprimir_out();}
+imprimir{imprimir_out();}
 ;
 imprimir:
 output variable eos
@@ -154,9 +161,9 @@ simlog:
 
 
 /*aca viene toda la logica de la definicion de una variable */
-definir2:
+/*definir2:
 definicion NEWLINE
-;
+;*/
 definicion:
     variable definir operador eos{
       imprimir_defnum();/*voy a quytar el contador de definciones porqe no me esta sirviendo */
@@ -189,7 +196,7 @@ ciclofor:
     ;
 
 encabezado_for:
-    for variablefor to operador do NEWLINE { iniciofor = linea_actual - 1; foropen++;}
+    for variablefor to operador do { iniciofor = linea_actual; foropen++;} opt_nl
     ;
 
 variablefor:
@@ -204,7 +211,7 @@ bloque1dw bloque2dw bloque3dw { {printf(" -> LINEAS %d-%d : CADENA VÁLIDA: CICL
 ;
 
 bloque1dw:
-do NEWLINE {whileopen++; iniciowhile=linea_actual-1;}
+do {whileopen++; iniciowhile=linea_actual;} opt_nl
 ;
 
 bloque2dw:
@@ -212,7 +219,7 @@ instrucciones masinstrucciones
 ;
 
 bloque3dw:
- while condicion NEWLINE {finwhile=linea_actual-1; whileopen--;}
+ while condicion {finwhile=linea_actual; whileopen--;}
 ;
 
 cicloif:
@@ -223,7 +230,7 @@ cicloif:
     ;
 
 if_encabezado:
-    if condicion then NEWLINE { $$ = linea_actual - 1; ifopen++; } /*investigamos que $$ es oara guardar en pila una variable, especialmente nos sirve para validar ifs anidados y saber en que linea van porque inician muchos nuevos contadores */
+    if condicion then opt_nl { $$ = $1; ifopen++; }
     ;
 
 cuerpo_instrucciones:
@@ -231,11 +238,11 @@ cuerpo_instrucciones:
     ;
 
 if_ramas:
-    %empty
-  | else if condicion then NEWLINE bloque_begin_end if_ramas
-  | else NEWLINE bloque_begin_end
+    %empty %prec REDUCE_NO_ELSE
+  | else if condicion then opt_nl bloque_begin_end if_ramas
+  | else opt_nl bloque_begin_end
   ;
-;
+
 /*bloque utilm tanto para for como para while */
 
 instrucciones:
@@ -243,6 +250,9 @@ definicion { contador = 0; }
 | lectura {contador=0;}
 |impresion {contador=0;}
 |cicloif
+|ciclofor
+|dowhile
+|comentario
 ;
 
 masinstrucciones:
@@ -253,13 +263,13 @@ masinstrucciones:
 /*bloque para for y para if */
 
 bloque_begin_end:
-    begin NEWLINE cuerpo_instrucciones end NEWLINE { finif = linea_actual - 1; finfor=linea_actual-1; foropen=0; whileopen=0; ifopen=0;}
+    begin opt_nl cuerpo_instrucciones end{ finif = linea_actual; finfor=linea_actual; foropen=0; whileopen=0; ifopen=0;}
     ;
 
 /*aca integrqamos la logica de declaradciones con allocate */
 
 declarar:
-declaracion NEWLINE   {printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual - 1);}
+declaracion {printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual);}
 ;
 declaracion:
     variable lista_ids allocate eos
@@ -280,11 +290,12 @@ begin:
 TK_BEGIN
 ;
 if:
-TK_IF
+TK_IF { $$ = linea_actual; }
 ;
 else:
-TK_ELSE {thenopen=1;}
-;
+    TK_ELSE {thenopen=1;}
+  | NEWLINE else
+  ;
 dospuntos:
 TK_DP
 ;
@@ -335,6 +346,7 @@ factores
 factores:
     variable
   | numero
+  | restar numero
   ;
 allocate:
 TK_ALLOCATE 
@@ -522,13 +534,13 @@ printf(" -> LINEA %d: CADENA VÁLIDA: AGRUPACIÓN DE CONDICION\n", linea_actual 
 void imprimir_in(void){
   if (whileopen==0 && foropen==0 && thenopen==0)
   {
-   printf(" -> LINEA %d: CADENA VÁLIDA: LECTURA DE VARIABLE\n", linea_actual-1);
+   printf(" -> LINEA %d: CADENA VÁLIDA: LECTURA DE VARIABLE\n", linea_actual);
   }
 }
 void imprimir_out(void){
   if (whileopen==0 && foropen==0 && thenopen==0)
   {
-   printf(" -> LINEA %d: CADENA VÁLIDA: IMPRESION DE VARIABLE\n", linea_actual-1);
+   printf(" -> LINEA %d: CADENA VÁLIDA: IMPRESION DE VARIABLE\n", linea_actual);
   }
 }
 void imprimir_defnum(){

@@ -1,0 +1,10 @@
+MAIN
+BEGIN
+    x:y:res ALLOCATE; x := 1; y := 10; res := 0;
+    *** Bucle acumulativo trampa ***
+    DO
+        res := res + x;
+        x := x + 1;
+    WHILE (x <= y)
+    OUTPUT res;
+END

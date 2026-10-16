@@ -1,14 +1,16 @@
+*** Comentario inicial largo para probar el lexer en los extremos ***
 
 MAIN
 BEGIN
     v1:v2:v3:v4:v5:res:i ALLOCATE;
-    *** Lecturas multiples y asignaciones con numeros negativos y potencia ***
-    INPUT v1;
-    INPUT v2;
-    INPUT v3;
     
-    v4 := -2 ** 3;
-    v5 := (v2 / v3)- 1 + (5 - (7 + (8**3)));
+    *** Lecturas multiples y asignaciones con numeros negativos y potencia ***
+    INPUT v1; INPUT v2;
+    INPUT v2;
+    INPUT v3; v1:v2:v3:v4:v5:res:i ALLOCATE;
+    
+    v4 := 2 ** 3;
+    v5 := -5 + v1 * (v2 / v3 - 1);
     
     *** Bloque IF anidado obligatorio con condiciones compuestas (AND / OR / <> / ==) ***
     IF (v1 < v2 AND v3 >= 0 OR v4 <> 10) THEN
@@ -40,4 +42,26 @@ BEGIN
     END
     
     OUTPUT res;
+
+    x:=12-5;
+    IF (X==12) THEN 
+    BEGIN 
+    res:=15; 
+    END 
+    ELSE 
+    BEGIN 
+    res:=1; 
+
+    END
+    IF (X==12) THEN BEGIN res:=15; 
+    END 
+    ELSE 
+    BEGIN res:=1; 
+    END
+
+IF (X==12) THEN BEGIN res:=15; END ELSE BEGIN res:=1; END
+
 END
+
+
+*** Fin del programa de prueba limite ***

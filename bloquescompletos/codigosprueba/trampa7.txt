@@ -1,0 +1,26 @@
+MAIN
+BEGIN
+    x:y:limite:acumulador:j ALLOCATE;
+    INPUT x; INPUT y; INPUT limite;
+    acumulador := 0;
+    
+    FOR j := 1 to limite do
+    BEGIN
+        IF (x > y AND j <> 3) THEN
+        BEGIN
+            acumulador := acumulador + (x ** 2) / y;
+        END
+        ELSE
+        BEGIN
+            IF (j == 5 OR x == y) THEN
+            BEGIN
+                acumulador := acumulador - 10;
+            END
+            ELSE
+            BEGIN
+                acumulador := acumulador + j;
+            END
+        END
+    END
+    OUTPUT acumulador;
+END

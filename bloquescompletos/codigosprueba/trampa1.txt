@@ -1,0 +1,6 @@
+MAIN
+BEGIN
+    a:b:c ALLOCATE; INPUT a; INPUT b;
+    c := a ** 2 + b ** 2;
+    OUTPUT a; OUTPUT b; OUTPUT c;
+END
