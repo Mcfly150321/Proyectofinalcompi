@@ -177,11 +177,11 @@ enum yysymbol_kind_t
   YYSYMBOL_NEWLINE = 37,                   /* NEWLINE  */
   YYSYMBOL_REDUCE_NO_ELSE = 38,            /* REDUCE_NO_ELSE  */
   YYSYMBOL_YYACCEPT = 39,                  /* $accept  */
-  YYSYMBOL_inicio3 = 40,                   /* inicio3  */
-  YYSYMBOL_inicio2 = 41,                   /* inicio2  */
+  YYSYMBOL_bloque = 40,                    /* bloque  */
+  YYSYMBOL_inicio = 41,                    /* inicio  */
   YYSYMBOL_opt_inicio = 42,                /* opt_inicio  */
   YYSYMBOL_opt_nl = 43,                    /* opt_nl  */
-  YYSYMBOL_inicio = 44,                    /* inicio  */
+  YYSYMBOL_cuerpo = 44,                    /* cuerpo  */
   YYSYMBOL_operacion = 45,                 /* operacion  */
   YYSYMBOL_comentario = 46,                /* comentario  */
   YYSYMBOL_lectura = 47,                   /* lectura  */
@@ -667,8 +667,8 @@ static const char *const yytname[] =
   "TK_IG", "TK_NIG", "TK_AND", "TK_OR", "TK_ASIG", "TK_EOS", "TK_DP",
   "TK_ALLOCATE", "TK_MAIN", "TK_INPUT", "TK_OUTPUT", "TK_THEN", "TK_IF",
   "TK_ELSE", "TK_FOR", "TK_DO", "TK_BEGIN", "TK_TO", "TK_END", "TK_WHILE",
-  "TK_COMENTARIO", "NEWLINE", "REDUCE_NO_ELSE", "$accept", "inicio3",
-  "inicio2", "opt_inicio", "opt_nl", "inicio", "operacion", "comentario",
+  "TK_COMENTARIO", "NEWLINE", "REDUCE_NO_ELSE", "$accept", "bloque",
+  "inicio", "opt_inicio", "opt_nl", "cuerpo", "operacion", "comentario",
   "lectura", "leer", "impresion", "imprimir", "output", "input",
   "expresion", "aritmetica", "oparit", "otraaritmetica", "simarit",
   "logica", "otralogica", "conectorlogico", "simlog", "definicion",
@@ -1341,7 +1341,7 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 3: /* inicio2: TK_MAIN opt_inicio TK_BEGIN inicio TK_END opt_inicio  */
+  case 3: /* inicio: TK_MAIN opt_inicio TK_BEGIN cuerpo TK_END opt_inicio  */
 #line 64 "parser.y"
                                                         {
         printf("\nBloque valido codigo completo\n");

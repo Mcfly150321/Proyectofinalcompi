@@ -54,14 +54,14 @@ extern int linea_actual;
 %precedence REDUCE_NO_ELSE
 %precedence NEWLINE
 
-%start inicio3
+%start bloque
 
 %%
-inicio3:
-opt_inicio inicio2
+bloque:
+opt_inicio inicio
 ;
-inicio2:
-    TK_MAIN opt_inicio TK_BEGIN inicio TK_END opt_inicio{
+inicio:
+    TK_MAIN opt_inicio TK_BEGIN cuerpo TK_END opt_inicio{
         printf("\nBloque valido codigo completo\n");
     }
 opt_inicio:
@@ -74,7 +74,7 @@ opt_nl:
     %empty
   | opt_nl NEWLINE
   ;
-inicio:
+cuerpo:
     operacion
   ;
 operacion:
