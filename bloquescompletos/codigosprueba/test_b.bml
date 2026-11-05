@@ -13,8 +13,7 @@ MAIN
 
     FOR i := 10 TO -1 DO
     BEGIN
-      total := total + i;
-      x := 2**z;
+    IF (total <2) THEN BEGIN total := total + i; x := 2**z; END
     END
 
     IF(x<y) THEN
@@ -23,11 +22,14 @@ MAIN
 	   IF(x<10) THEN
       	   BEGIN
              z:=x+y;
-      	   END		
+      	   END
+      ELSE BEGIN z:=x-y; END		
       END
     ELSE
       BEGIN
           z:=0;
       END 
    OUTPUT z;
+   INPUT y;
+  z:=1+x;
 END

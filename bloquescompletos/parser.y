@@ -13,6 +13,7 @@ void imprimir_in(void);
 void imprimir_out(void);
 
 int contador = 0;
+int ramas=0;
 int contador2=0;
 
 /*
@@ -52,8 +53,7 @@ extern int linea_actual;
 %token TK_COMENTARIO
 %token NEWLINE
 
-%precedence REDUCE_NO_ELSE
-%precedence NEWLINE
+
 
 %start programa
 %expect 1
@@ -80,11 +80,9 @@ cuerpo:
   ;
 operacion:
     %empty
-  | operacion expresion
-  | operacion definicion
   | operacion ciclofor
-  | operacion condicionar
   | operacion declarar
+  | operacion definicion
   | operacion dowhile
   | operacion NEWLINE
   | operacion cicloif
@@ -114,10 +112,7 @@ TK_INPUT
 ;
 
   /*aca viene la logica con la que se esctructuran las expresiones logicas y aritmeticas */
-expresion:
-    logica NEWLINE     { imprimir_logica(); }
-  | aritmetica NEWLINE { imprimir_aritmetica(); }
-  ;
+
 
 
 aritmetica:
@@ -176,9 +171,7 @@ definicion:
 
 
 /*aca viene la logica de las condicones entre parentesis */
-condicionar:
- condicion NEWLINE {imprimir_condicion();}
- ;
+
 condicion:
   agrupa1 logica agrupa2 {    contador2=0; }
   ;
@@ -192,12 +185,14 @@ agrupa2:
 /*aca viene la logica del clco for */
 ciclofor:
     encabezado_for bloque_begin_end {
-        printf(" -> LINEAS %d-%d : CADENA VÁLIDA: CICLO FOR\n", iniciofor, finfor);
+      foropen--;
+        printf(" -> LINEAS %d-%d : CADENA VÁLIDA: CICLO FOR\n", $1, $2);
+        
     }
     ;
 
 encabezado_for:
-    for variablefor to operador do { iniciofor = linea_actual; foropen++;} opt_nl
+    for variablefor to operador do { iniciofor = linea_actual; foropen++; $$=$1;} opt_nl
     ;
 
 variablefor:
@@ -226,8 +221,13 @@ bloque3dw:
 cicloif:
     if_encabezado bloque_begin_end if_ramas {
         ifopen--;
-        printf("-> LINEAS %d-%d: CADENA VALIDA: CICLO IF\n", $1, finif);
-    }
+        if ($3>0){
+            printf("-> LINEAS %d-%d: CADENA VALIDA: CICLO IF-ELSE\n", $1, $3);
+        }else{
+        printf("-> LINEAS %d-%d: CADENA VALIDA: CICLO IF\n", $1, $2);
+        }
+      }
+
     ;
 
 if_encabezado:
@@ -239,9 +239,9 @@ cuerpo_instrucciones:
     ;
 
 if_ramas:
-    %empty %prec REDUCE_NO_ELSE
-  | else if condicion then opt_nl bloque_begin_end if_ramas
-  | else opt_nl bloque_begin_end
+    %empty { $$ = 0; }
+  | else if condicion then opt_nl bloque_begin_end if_ramas { $$ = ($7 != 0) ? $7 : $6; }
+  | else opt_nl bloque_begin_end { $$ = $3; }
   ;
 
 /*bloque utilm tanto para for como para while */
@@ -264,7 +264,7 @@ masinstrucciones:
 /*bloque para for y para if */
 
 bloque_begin_end:
-    begin opt_nl cuerpo_instrucciones end opt_nl { finif = linea_actual; finfor=linea_actual; foropen=0; whileopen=0; ifopen=0;}
+    begin opt_nl cuerpo_instrucciones end opt_nl{ $$ = $4; }
     ;
 
 /*aca integrqamos la logica de declaradciones con allocate */
@@ -303,7 +303,7 @@ eos:
 TK_EOS
 ;
 for:
-TK_FOR
+TK_FOR {$$ = linea_actual;}
 ;
 do:
 TK_DO
@@ -312,7 +312,7 @@ to:
 TK_TO
 ;
 end:
-TK_END  {thenopen=0;}
+    TK_END { thenopen = 0; $$ = linea_actual; }
 ;
 variable:
     TK_ID
