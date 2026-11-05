@@ -111,8 +111,6 @@ input:
 TK_INPUT
 ;
 
-  /*aca viene la logica con la que se esctructuran las expresiones logicas y aritmeticas */
-
 
 
 aritmetica:
