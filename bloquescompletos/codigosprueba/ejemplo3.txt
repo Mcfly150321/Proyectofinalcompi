@@ -1,0 +1,9 @@
+MAIN
+ BEGIN
+    a:b:c:res ALLOCATE;
+    INPUT a;
+    INPUT b;
+    c := 2 ** 3;
+    res := a + b * c - a / 2;
+    OUTPUT res;
+ END

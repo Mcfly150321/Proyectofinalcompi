@@ -1,0 +1,27 @@
+MAIN
+BEGIN
+    a:b:c:d:res ALLOCATE; INPUT a; INPUT b; INPUT c; INPUT d;
+    IF (a < b AND c < d) THEN
+    BEGIN
+        IF (a == 0 OR b == 0) THEN
+        BEGIN
+            res := 10;
+        END
+        ELSE
+        BEGIN
+            res := (a + b) ** 2 - c * d;
+        END
+    END
+    ELSE
+    BEGIN
+        IF (a >= 100) THEN
+        BEGIN
+            res := a / 2;
+        END
+        ELSE
+        BEGIN
+            res := 0;
+        END
+    END
+    OUTPUT res;
+END

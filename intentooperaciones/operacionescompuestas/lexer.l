@@ -4,6 +4,7 @@ int linea_actual = 1;
 %}
 
 %option noyywrap
+%option yylineno
 
 %%
 "**"        { return TK_POTENCIACION; }
@@ -20,8 +21,19 @@ int linea_actual = 1;
 "OUTPUT"    { return TK_OUTPUT; }
 "IF"        { return TK_IF; }
 "ELSE"      { return TK_ELSE; }
+<<<<<<< HEAD
 [a-zA-Z][a-zA-Z0-9_]*  { return TK_ID; }
+=======
+"FOR" {return TK_FOR; }
+"BEGIN" {return TK_BEGIN;}
+"END" {return TK_END;}
+"TO" {return TK_TO;}
+"DO" {return TK_DO;}
+"WHILE" {return TK_WHILE;}
+[a-zA-Z_][a-zA-Z0-9_]*  { return TK_ID; }
+>>>>>>> e75d46e6879ddfdb1be0c81107fe128486fba4dd
 ":="        { return TK_ASIG; }
+":"         { return TK_DP; }
 ";"         { return TK_EOS; }
 ":"         { return TK_DP; }
 "("         { return TK_PAB; }
@@ -35,6 +47,14 @@ int linea_actual = 1;
 "\n"        { linea_actual++; return NEWLINE; }
 [ \t\r]+    { /* ignorar espacios */ }
 .           { return yytext[0]; }
-
+<<EOF>> {
+    static int enviado = 0;
+    if (!enviado) {
+        enviado = 1;
+        linea_actual++;   
+        return NEWLINE;
+    }
+    yyterminate();
+}
 %%
 

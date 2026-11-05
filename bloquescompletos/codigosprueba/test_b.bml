@@ -1,0 +1,33 @@
+*** comentario ***
+
+MAIN
+ BEGIN
+    x:y:z:i:total ALLOCATE;
+    INPUT x;
+    INPUT y;
+    z:=1+x;
+
+    DO
+     total := total + 1;
+    WHILE(x < 25 AND x >0)
+
+    FOR i := 10 TO -1 DO
+    BEGIN
+      total := total + i;
+      x := 2**z;
+    END
+
+    IF(x<y) THEN
+      BEGIN
+          z:=x+y;
+	   IF(x<10) THEN
+      	   BEGIN
+             z:=x+y;
+      	   END		
+      END
+    ELSE
+      BEGIN
+          z:=0;
+      END 
+   OUTPUT z;
+END

@@ -1,0 +1,24 @@
+MAIN
+ BEGIN
+    base:expo:resultado:i ALLOCATE;
+    INPUT base;
+    INPUT expo;
+    
+    IF (expo < 0) THEN
+    BEGIN
+        resultado := 0;
+    END
+    ELSE
+    BEGIN
+        IF (expo == 0) THEN
+        BEGIN
+            resultado := 1;
+        END
+        ELSE
+        BEGIN
+            resultado := base ** expo;
+        END
+    END
+    
+    OUTPUT resultado;
+ END

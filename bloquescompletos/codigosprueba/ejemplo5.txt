@@ -1,0 +1,16 @@
+MAIN
+ BEGIN
+    x:y:z:resultado ALLOCATE;
+    INPUT x;
+    INPUT y;
+    INPUT z;
+    IF (x < y AND y > z OR x == 0) THEN
+    BEGIN
+        resultado := 1;
+    END
+    ELSE
+    BEGIN
+        resultado := 0;
+    END
+    OUTPUT resultado;
+ END

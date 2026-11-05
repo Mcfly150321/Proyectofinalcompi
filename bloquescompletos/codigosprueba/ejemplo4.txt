@@ -1,0 +1,10 @@
+MAIN
+ BEGIN
+    edad:limite ALLOCATE;
+    INPUT edad;
+    limite := 18;
+    IF (edad >= limite) THEN
+    BEGIN
+        OUTPUT edad;
+    END
+ END

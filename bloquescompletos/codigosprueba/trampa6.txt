@@ -1,0 +1,17 @@
+MAIN
+BEGIN
+    n:sum:i ALLOCATE; INPUT n; sum := 0; i := 1;
+    *** Bucle trampa con condicional interno ***
+    DO
+        IF (i < 5) THEN
+        BEGIN
+            sum := sum + i * 2;
+        END
+        ELSE
+        BEGIN
+            sum := sum + i;
+        END
+        i := i + 1;
+    WHILE (i <= n)
+    OUTPUT sum;
+END
