@@ -1,0 +1,10 @@
+MAIN
+ BEGIN
+    i:suma ALLOCATE;
+    suma := 0;
+    FOR i := 1 to 5 do
+    BEGIN
+        suma := suma + i;
+    END
+    OUTPUT suma;
+ END

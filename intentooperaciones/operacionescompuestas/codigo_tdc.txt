@@ -1,0 +1,20 @@
+main:
+        DECL a
+        DECL b
+        DECL total
+        a=0;
+        i=1;
+l1:
+        t1=a+2;
+        a=t1;
+        t2=i+1;
+        i=t2;
+        t3=i<=2;
+        t4=1>0;
+        t5=t3&&t4;
+        ifnz t5 goto l1:
+        total=a;
+        DECL d
+        t6=3+5;
+        d=t6;
+

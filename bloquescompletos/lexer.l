@@ -1,0 +1,61 @@
+%{
+#include <string.h>
+#include "parser.tab.h"
+int linea_actual = 1; 
+%}
+
+%option noyywrap
+%option yylineno
+
+%%
+"**"        { yylval.str = strdup(yytext); return TK_POTENCIACION; }
+"+"         { yylval.str = strdup(yytext); return TK_SUMA; }
+"-"         { yylval.str = strdup(yytext); return TK_RESTA; }
+"/"         { yylval.str = strdup(yytext); return TK_DIVISION; }
+"*"         { yylval.str = strdup(yytext); return TK_MULTIPLICACION; }
+0|[1-9][0-9]*  { yylval.str = strdup(yytext); return TK_NUMERO; }
+"AND"       { return TK_AND; }
+"OR"        { return TK_OR; }
+"ALLOCATE"  { return TK_ALLOCATE; }
+"MAIN"      { return TK_MAIN; }
+"INPUT"     { return TK_INPUT; }
+"OUTPUT"    { return TK_OUTPUT; }
+"IF"        { return TK_IF; }
+"ELSE"      { return TK_ELSE; }
+"FOR"       { return TK_FOR; }
+"BEGIN"     { return TK_BEGIN;}
+"END"       { return TK_END;}
+"TO"|"to"   { return TK_TO;}
+"DO"|"do"   { return TK_DO;}
+"THEN"      { return TK_THEN;}
+"WHILE"     { return TK_WHILE;}
+\*{3}([^*]|\*[^*]|\*\*[^*])*\*{3} { return TK_COMENTARIO; }
+[a-zA-Z_][a-zA-Z0-9_]*  { yylval.str = strdup(yytext); return TK_ID; }
+":="        { return TK_ASIG; }
+":"         { return TK_DP; }
+";"         { return TK_EOS; }
+"("         { return TK_PAB; }
+")"         { return TK_PCE; }
+">="        { yylval.str = strdup(yytext); return TK_MAIG; }
+"<="        { yylval.str = strdup(yytext); return TK_MEIG; }
+"=="        { yylval.str = strdup(yytext); return TK_IG; }
+"<>"        { yylval.str = strdup(yytext); return TK_NIG; }
+">"         { yylval.str = strdup(yytext); return TK_MAY; }
+"<"         { yylval.str = strdup(yytext); return TK_MEN; }
+"\n"        { linea_actual++; return NEWLINE; }
+[ \t\r]+    { /* ignorar espacios */ }
+.           { return yytext[0]; }
+<<EOF>> {
+    static int enviado = 0;
+    if (!enviado) {
+        enviado = 1;
+        linea_actual++;   
+        return NEWLINE;
+    }
+    yyterminate();
+}
+<<<<<<< HEAD
+%%
+=======
+%%
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21

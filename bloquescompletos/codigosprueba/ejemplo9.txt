@@ -1,0 +1,11 @@
+MAIN
+ BEGIN
+    i:n:acumulador ALLOCATE;
+    INPUT n;
+    acumulador := 1;
+    FOR i := 1 to n do
+    BEGIN
+        acumulador := acumulador * i;
+    END
+    OUTPUT acumulador;
+ END

@@ -1,0 +1,13 @@
+*** Archivo de prueba trampa 4: Comentarios externos y estructuras compactas ***
+
+
+MAIN
+BEGIN
+    a:b:resultado ALLOCATE; INPUT a; INPUT b;
+    *** Condicional compacto de una sola línea ***
+    IF (a > b) THEN BEGIN resultado := a; END ELSE BEGIN resultado := b; END
+    *** Bucle FOR compacto en línea única ***
+    FOR i := 1 to 3 do BEGIN resultado := resultado + i; END
+    OUTPUT resultado;
+END
+*** Fin del archivo de prueba trampa 4 - Verificando cierre del lexer ***

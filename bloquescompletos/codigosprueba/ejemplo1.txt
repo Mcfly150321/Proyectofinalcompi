@@ -1,0 +1,16 @@
+MAIN
+ BEGIN
+    x:y:z ALLOCATE;
+    INPUT x;
+    INPUT y;
+    z:=1+x;
+    IF(x<y) THEN
+      BEGIN
+          z:=x+y;
+      END
+    ELSE
+      BEGIN
+          z:=0;
+      END 
+   OUTPUT z;
+END

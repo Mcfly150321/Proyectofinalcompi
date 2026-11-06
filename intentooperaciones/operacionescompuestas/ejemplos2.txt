@@ -1,0 +1,33 @@
+x ALLOCATE;
+var1:var2:resultado_final:temp ALLOCATE;
+i:j:k:n ALLOCATE;
+a + 10 - 2
+base ** exp
+total / 10 * 2 + 5 - 1
+1 + 2 + 3 + 4 + 5 + 6
+x >= y
+status <> 0
+alpha == beta
+x > 0 AND x < 100 OR y == 50
+p <= 10 AND q >= 20 AND r <> 30
+(status == 1)
+(x > 0 AND y < 10)
+(a == b OR c <> d AND e >= f)
+acumulador := 500
+limite := 0
+FOR k := 0 TO limit DO
+BEGIN
+acum := acum + k * 2;
+temp := temp - 1;
+END
+FOR paso := 1 TO 50 DO
+BEGIN
+val1 := 10;
+val2 := val2 + 1;
+val3 := val3 * 2;
+val4 := 0;
+END
+a::b ALLOCATE;
+x := ;
+(a > )
++

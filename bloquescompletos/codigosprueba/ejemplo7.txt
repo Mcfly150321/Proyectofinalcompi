@@ -1,0 +1,11 @@
+MAIN
+ BEGIN
+    contador:total ALLOCATE;
+    contador := 0;
+    total := 0;
+    DO
+        total := total + contador;
+        contador := contador + 1;
+    WHILE (contador < 10)
+    OUTPUT total;
+ END

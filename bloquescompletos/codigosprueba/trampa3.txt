@@ -1,0 +1,16 @@
+MAIN
+BEGIN
+    val:lim:i:total ALLOCATE; INPUT val; INPUT lim; total := 0;
+    IF (val > 0 AND val < 10 OR lim == 100) THEN
+    BEGIN
+        FOR i := 1 to 5 do
+        BEGIN
+            total := total + val * i;
+        END
+    END
+    ELSE
+    BEGIN
+        total := -1;
+    END
+    OUTPUT total;
+END

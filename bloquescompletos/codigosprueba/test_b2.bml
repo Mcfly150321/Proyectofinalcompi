@@ -1,0 +1,11 @@
+MAIN
+BEGIN
+  a:i:total ALLOCATE;
+  a:=0;
+  i:=1;
+  DO
+    a:=a**2;
+    i := i  + 1;
+  WHILE(i<=2 AND a>0)
+  total := a;
+END
