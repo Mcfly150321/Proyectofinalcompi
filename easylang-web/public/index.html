@@ -148,7 +148,7 @@ const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 let asmText="";
 
 function status(cls,html){const s=$("st");s.className=cls;s.innerHTML=html}
-function clearOut(){["tdc","asm","out","vars","ana"].forEach(i=>$(i).textContent="");$("dl").disabled=true;asmText=""}
+function clearOut(){["tdc","asm","out","ana"].forEach(i=>$(i).textContent="");$("dl").disabled=true;asmText=""}
 
 function mark(l){
   const ta=$("src"),ls=ta.value.split("\n"),pos=ls.slice(0,l-1).join("\n").length+(l>1?1:0);
