@@ -1,4 +1,5 @@
 main:
+<<<<<<< HEAD
         call input;
         pop x;
         call input;
@@ -40,4 +41,14 @@ l4:
         z=0;
 l5:
         push z;
+=======
+        DECL a
+        DECL b
+        call input;
+        pop b;
+        t1=1+2;
+        t2=t1+b;
+        a=t2;
+        push a;
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
         call output;

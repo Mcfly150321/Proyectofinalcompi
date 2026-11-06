@@ -1,0 +1,363 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{hyperref}
+
+% Configuración de colores para listings
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen}\itshape,
+    keywordstyle=\color{blue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\hyphenation{com-pi-la-dor di-rec-cio-nes es-truc-tu-ra-do ins-truc-cio-nes}
+
+\begin{document}
+
+\title{Diseño e Implementación de un Compilador E2E para el Lenguaje EasyLang con Flex, Bison y Backend en Ensamblador x86 NASM}
+
+\author{
+    \IEEEauthorblockN{Arturo Alejandro Maldonado Orozco\IEEEauthorrefmark{1}, Juan Luis Cojtin Herrera\IEEEauthorrefmark{2}, y Sebastián Rodrigo Rodas Pineda\IEEEauthorrefmark{3}}
+    \IEEEauthorblockA{\textit{Facultad de Ingeniería, Ingeniería en Sistemas, Informática y Ciencias de la Computación} \\
+    \textit{Universidad Mesoamericana}\\
+    Quetzaltenango, Guatemala \\
+    \IEEEauthorrefmark{1}20arturomaldonado@umes.edu.gt, Carné: 202308110 \\
+    \IEEEauthorrefmark{2}juanluis2005@umes.edu.gt, Carné: 202408007 \\
+    \IEEEauthorrefmark{3}srodas477@umes.edu.gt, Carné: 202408060}
+}
+
+\maketitle
+
+\begin{abstract}
+Este artículo describe el diseño, la especificación formal y la implementación de un compilador completo de extremo a extremo (\textit{End-to-End}) para un lenguaje estructurado e imperativo denominado EasyLang. El sistema abarca el análisis léxico mediante expresiones regulares en Flex, el análisis sintáctico y semántico fundamentado en una gramática libre de contexto procesada con Bison (Yacc), la traducción dirigida por la sintaxis para la generación de Código de Tres Direcciones (TDC/TAC) y un \textit{backend} dedicado que traduce el código intermedio a ensamblador de 32 bits compatible con el ensamblador libre NASM bajo arquitectura x86/Linux. Se analizan los retos de diseño, tales como la asignación dinámica de temporales, la linearización de estructuras de control anidadas (\texttt{IF-THEN-ELSE}, bucles \texttt{FOR} y \texttt{DO-WHILE}), la declaración compuesta de identificadores en memoria (\texttt{ALLOCATE}) y la administración óptima de registros en el código objeto final. Los resultados demuestran la viabilidad, correctitud y robustez del compilador frente a un conjunto integral de programas de prueba y casos límite.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Compiladores, Flex, Bison, Código de Tres Direcciones, Ensamblador x86, NASM, EasyLang, Análisis Léxico, Análisis Sintáctico.
+\end{IEEEkeywords}
+
+\section{Introducción}
+\IEEEPARstart{E}{l} estudio e implementación de procesadores de lenguajes de programación constituye uno de los pilares formativos y prácticos más rigurosos dentro de la ciencia de la computación y la ingeniería de software. Un compilador tradicional divide su tarea en dos grandes componentes: el \textit{Front-End}, encargado de validar las reglas léxicas, sintácticas y semánticas del lenguaje fuente para producir una representación intermedia, y el \textit{Back-End}, responsable de mapear dicha representación al conjunto de instrucciones de la máquina destino.
+
+En el marco del proyecto final de Compiladores, se planteó el desarrollo de un compilador completo para el lenguaje \textbf{EasyLang} (con extensión común \texttt{.bml}), un lenguaje imperativo que combina conceptos sintácticos de lenguajes como Pascal, BASIC y C. Entre sus peculiaridades se encuentran la reserva explícita de variables mediante listas concatenadas por dos puntos seguidas de la palabra clave \texttt{ALLOCATE}, una sintaxis clara para estructuras condicionales e iterativas (\texttt{FOR}, \texttt{DO-WHILE}), soporte para exponenciación nativa (\texttt{**}) y mecanismos básicos de entrada/salida por consola (\texttt{INPUT} y \texttt{OUTPUT}).
+
+El presente artículo documenta la arquitectura técnica, las decisiones de diseño y las diferentes fases que componen la solución implementada:
+\begin{enumerate}
+    \item \textbf{Fase Léxica:} Reconocimiento de unidades léxicas (tokens) mediante autómatas finitos deterministas generados con Flex.
+    \item \textbf{Fase Sintáctica y Semántica:} Especificación gramatical libre de contexto $LALR(1)$ en Bison, acompañada de acciones semánticas embebidas.
+    \item \textbf{Generación de Código Intermedio (TDC):} Linearización del flujo de control y síntesis de expresiones complejas en cuádruplas/instrucciones de tres direcciones.
+    \item \textbf{Generación de Código Objeto (Backend x86):} Traductor en C que transforma las directivas intermedias en instrucciones de máquina ensamblador para la arquitectura Intel x86 de 32 bits con sintaxis NASM.
+\end{enumerate}
+
+\section{Arquitectura Global del Sistema}
+El flujo de compilación sigue un esquema modular donde cada etapa transforma la información de manera incremental, como se ilustra conceptualmente a continuación:
+
+\begin{figure}[htbp]
+\centering
+\fbox{
+\begin{minipage}{0.92\columnwidth}
+\small
+\textbf{Pipeline de Compilación:}
+\begin{enumerate}
+    \item \textbf{Código Fuente EasyLang (\texttt{.bml})} $\rightarrow$ \texttt{lexer.l} (Flex).
+    \item \textbf{Flujo de Tokens} $\rightarrow$ \texttt{parser.y} (Bison).
+    \item \textbf{Código de Tres Direcciones (\texttt{codigo\_tdc.txt})} $\rightarrow$ \texttt{traductor.c}.
+    \item \textbf{Código Ensamblador x86 (\texttt{salida.asm})} $\rightarrow$ NASM + LD $\rightarrow$ \textbf{Binario Ejecutable ELF32}.
+\end{enumerate}
+\end{minipage}
+}
+\caption{Etapas del pipeline de compilación implementado.}
+\label{fig:pipeline}
+\end{figure}
+
+Esta separación estricta entre el generador de código intermedio y el emisor de código ensamblador permite desacoplar la sintaxis de alto nivel de las restricciones arquitectónicas de la máquina destino, facilitando la depuración y optimización de cada fase.
+
+\section{Análisis Léxico con Flex}
+La fase léxica fue desarrollada en el archivo \texttt{lexer.l}. El analizador es responsable de transformar el flujo de caracteres de entrada en un flujo continuo de componentes léxicos categorizados (tokens), eliminando caracteres no significativos como tabulaciones y retornos de carro, pero preservando los saltos de línea (\texttt{NEWLINE}) como delimitadores gramaticales significativos.
+
+\subsection{Categorización de Tokens}
+En el Cuadro~\ref{tab:tokens} se resumen las principales categorías de tokens configuradas en el analizador léxico.
+
+\begin{table}[htbp]
+\caption{Componentes Léxicos y Tokens Reconocidos}
+\label{tab:tokens}
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|p{4.2cm}|l|}
+\hline
+\textbf{Categoría} & \textbf{Patrón / Expresión Regular} & \textbf{Token Bison} \\
+\hline
+Palabras clave & \texttt{"MAIN"}, \texttt{"BEGIN"}, \texttt{"END"} & \texttt{TK\_MAIN}, etc. \\
+\hline
+Control flujo & \texttt{"IF"}, \texttt{"THEN"}, \texttt{"ELSE"} & \texttt{TK\_IF}, etc. \\
+\hline
+Bucles & \texttt{"FOR"}, \texttt{"TO"}, \texttt{"DO"}, \texttt{"WHILE"} & \texttt{TK\_FOR}, etc. \\
+\hline
+Memoria / IO & \texttt{"ALLOCATE"}, \texttt{"INPUT"}, \texttt{"OUTPUT"} & \texttt{TK\_ALLOCATE}, etc. \\
+\hline
+Aritméticos & \texttt{"+"}, \texttt{"-"}, \texttt{"*"}, \texttt{"/"}, \texttt{"**"} & \texttt{TK\_SUMA}, etc. \\
+\hline
+Relacionales & \texttt{"=="}, \texttt{"<>"}, \texttt{"<"}, \texttt{">"}, \texttt{"<="}, \texttt{">="} & \texttt{TK\_IG}, etc. \\
+\hline
+Lógicos & \texttt{"AND"}, \texttt{"OR"} & \texttt{TK\_AND}, \texttt{TK\_OR} \\
+\hline
+Asignación & \texttt{":="} & \texttt{TK\_ASIG} \\
+\hline
+Identificador & \texttt{[a-zA-Z\_][a-zA-Z0-9\_]*} & \texttt{TK\_ID} \\
+\hline
+Constantes & \texttt{0|[1-9][0-9]*} & \texttt{TK\_NUMERO} \\
+\hline
+Comentarios & \texttt{\textbackslash*\textbackslash*([$^\wedge$*]|\dots)*\textbackslash*\textbackslash*} & \texttt{TK\_COMENTARIO} \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Manejo de Comentarios y Fin de Archivo}
+Un aspecto destacado de la implementación léxica es el soporte para comentarios de bloque delimitados por tres asteriscos (\texttt{*** comentario ***}), implementados mediante una expresión regular que garantiza que los asteriscos intermedios no terminen la coincidencia de forma prematura. Asimismo, se incorporó una regla especial para \texttt{<<EOF>>} que asegura el envío final de un token \texttt{NEWLINE} antes de llamar a \texttt{yyterminate()}, resolviendo problemas de detección de fin de programa en archivos que carecen de salto de línea al final.
+
+\section{Análisis Sintáctico y Semántico con Bison}
+El analizador sintáctico (\texttt{parser.y}) implementa una gramática libre de contexto operada mediante el algoritmo de análisis ascendente $LALR(1)$.
+
+\subsection{Estructura del Programa y Gestión de Tipos}
+Para garantizar la flexibilidad semántica, el tipo semántico (\texttt{\%union}) se define con soporte para cadenas (\texttt{char*}), números enteros e información estructurada para el flujo de control:
+\begin{lstlisting}[language=C]
+typedef struct {
+    char *l_false;
+    char *l_end;
+    int linea_inicio;
+} IfInfo;
+
+typedef struct {
+    char *var;
+    char *limit;
+    char *l_start;
+    char *l_end;
+    int linea_inicio;
+} ForInfo;
+\end{lstlisting}
+
+La estructura de un programa completo exige una cláusula opcional de inicio seguida del bloque principal:
+\begin{equation}
+\textit{programa} \rightarrow \textit{opt\_inicio} \quad \textit{bloque}
+\end{equation}
+donde el bloque principal es delimitado por los pares léxicos:
+\begin{center}
+\texttt{MAIN NEWLINE BEGIN ... END}
+\end{center}
+
+\subsection{Declaración de Variables (\texttt{ALLOCATE})}
+En EasyLang, las variables no requieren de un tipo explícito (se manejan internamente como enteros de 32 bits en la máquina de destino), pero sí de una declaración explícita de reserva. La gramática soporta tanto identificadores únicos como secuencias encadenadas por dos puntos:
+\begin{lstlisting}
+x:y:z:i:total ALLOCATE;
+\end{lstlisting}
+En cada reconocimiento de identificador asociado a un \texttt{ALLOCATE}, la acción semántica genera directivas \texttt{DECL <id>} en el código intermedio, permitiendo que el generador de código posterior reserve la memoria correspondiente en la sección no inicializada (\texttt{.bss}).
+
+\subsection{Estructuras de Control y Traducción Dirigida por la Sintaxis}
+\subsubsection{Sentencia Condicional \texttt{IF-THEN-ELSE}}
+Para resolver el clásico problema del ``else colgante'' (\textit{dangling else}), se empleó la directiva \texttt{\%precedence REDUCE\_NO\_ELSE} junto con la resolución sintáctica de ramas opcionales. En cada sentencia condicional, el encabezado evalúa la condición booleana generando un salto condicional si es falso (\texttt{ifz}) hacia una etiqueta de escape o rama alternativa. Al término del bloque de la rama verdadera, se emite un salto incondicional (\texttt{jmp}) hacia la etiqueta de finalización.
+
+\subsubsection{Sentencia Iterativa \texttt{FOR}}
+La regla \texttt{FOR} encapsula la inicialización de la variable de control, la evaluación del límite en cada ciclo y el incremento unitario automático. Las estructuras semánticas \texttt{ForInfo} almacenan las etiquetas de retorno y salida necesarias para reconstruir el bucle.
+
+\subsubsection{Sentencia Iterativa \texttt{DO-WHILE}}
+La regla \texttt{DO ... WHILE (cond)} emite una etiqueta de inicio antes del cuerpo de instrucciones. Al alcanzar la cláusula \texttt{WHILE}, se evalúa la condición y se genera la instrucción:
+\begin{center}
+\texttt{ifnz tX goto lY}
+\end{center}
+la cual transfiere el control a la cabecera si el resultado es verdadero.
+
+\section{Generación de Código Intermedio (TDC)}
+La representación intermedia adoptada es el Código de Tres Direcciones (TDC / TAC). En este esquema, las operaciones complejas se descomponen en secuencias linealizadas donde cada instrucción contiene a lo sumo un operador y dos operandos fuente, almacenando el resultado en una variable temporal o destino.
+
+El compilador cuenta con dos generadores de identificadores únicos:
+\begin{itemize}
+    \item \texttt{nuevo\_temp()}: Genera nombres ordenados de variables temporales (\texttt{t1, t2, t3, \dots}).
+    \item \texttt{nueva\_label()}: Genera etiquetas de salto simbólico (\texttt{l1, l2, l3, \dots}).
+\end{itemize}
+
+\subsection{Soporte para Expresiones Aritméticas y Lógicas}
+Para operaciones aritméticas de dos operandos ($+$, $-$, $*$, $/$, $**$), la acción sintáctica sintetiza un nuevo temporal y emite la cuádrupla correspondiente:
+\begin{equation}
+t_k = op_1 \circ op_2
+\end{equation}
+Para evaluaciones booleanas con operadores lógicos de corto circuito o combinación (\texttt{AND}, \texttt{OR}), el compilador genera temporales que albergan el valor binario resultante ($1$ o $0$), facilitando la toma de decisiones mediante instrucciones condicionales homogéneas (\texttt{ifz} y \texttt{ifnz}).
+
+\section{Traducción a Código Objeto (Backend x86 NASM)}
+La fase final es desarrollada en \texttt{traductor.c}. Este componente actúa como un transpilador de Código de Tres Direcciones a lenguaje ensamblador para la arquitectura Intel x86 de 32 bits bajo la sintaxis del ensamblador NASM.
+
+\subsection{Asignación y Reutilización de Registros}
+Para evitar un desbordamiento innecesario de accesos a memoria, el traductor mantiene un registro de estado simple sobre los registros de propósito general \texttt{eax} y \texttt{ecx}. 
+\begin{itemize}
+    \item \texttt{temp\_eax}: Almacena el identificador temporal actualmente cargado en el acumulador \texttt{eax}.
+    \item \texttt{temp\_ecx}: Almacena el identificador del registro secundario \texttt{ecx}.
+\end{itemize}
+Cuando una instrucción requiere un operando que ya reside en \texttt{eax}, se omite la emisión de una instrucción \texttt{mov} redundante, aplicando una optimización básica a nivel de mirilla (\textit{peephole}).
+
+\subsection{Traducción de Comparaciones y Lógica}
+Las comparaciones relacionales ($<, >, \le, \ge, ==, <>$ ) se implementan mediante la secuencia típica en arquitecturas CISC x86:
+\begin{lstlisting}[language={[x86masm]Assembler}]
+    mov eax, [op1]
+    cmp eax, [op2]
+    setle al          ; segun la operacion
+    movzx eax, al     ; extension con ceros a 32 bits
+\end{lstlisting}
+Esto produce un valor booleano canónico ($1$ o $0$) en el registro de 32 bits, el cual es fácilmente evaluable mediante la instrucción \texttt{test eax, eax} seguida de \texttt{jnz} o \texttt{jz}.
+
+\subsection{Estructuración del Archivo Ensamblador}
+El archivo final generado (\texttt{salida.asm}) contiene dos secciones estándar:
+\begin{enumerate}
+    \item \textbf{Sección \texttt{.bss}:} Reserva bloques de memoria no inicializados para cada variable declarada mediante la directiva \texttt{resd 1} (4 bytes por entero).
+    \item \textbf{Sección \texttt{.text}:} Define el punto de entrada global \texttt{\_start}, seguido de las secuencias de instrucciones traducidas. Concluye con la llamada al sistema \texttt{sys\_exit} invocando la interrupción del kernel Linux:
+\begin{lstlisting}[language={[x86masm]Assembler}]
+    mov eax, 1        ; codigo sys_exit
+    xor ebx, ebx      ; codigo de retorno 0
+    int 0x80
+\end{lstlisting}
+\end{enumerate}
+
+\section{Validación Experimental y Resultados}
+Para verificar la fidelidad de todo el proceso de compilación, se utilizó la suite de pruebas del directorio \texttt{codigosprueba/}, en particular el programa representativo \texttt{test\_b.bml}.
+
+\subsection{Programa Fuente de Prueba}
+El siguiente fragmento ilustra un programa fuente complejo en EasyLang conteniendo reserva de variables, bucles y condicionales:
+
+\begin{lstlisting}
+*** Programa de Prueba EasyLang ***
+MAIN
+ BEGIN
+    x:y:z:i:total ALLOCATE;
+    INPUT x;
+    INPUT y;
+    z:=1+x;
+
+    DO
+     total := total + 1;
+    WHILE(x < 25 AND x > 0)
+
+    FOR i := 10 TO -1 DO
+    BEGIN
+     IF (total < 2) THEN BEGIN total := total + i; x := 2**z; END
+    END
+
+    IF(x < y) THEN
+      BEGIN
+        z:=x+y;
+      END
+    ELSE
+      BEGIN
+        z:=0;
+      END 
+    OUTPUT z;
+ END
+\end{lstlisting}
+
+\subsection{Código Intermedio Generado}
+El compilador genera el archivo \texttt{codigo\_tdc.txt}, del cual se muestra a continuación una sección correspondiente a la evaluación del bucle \texttt{DO-WHILE}:
+
+\begin{lstlisting}
+l1:
+        t2=total+1;
+        total=t2;
+        t3=x<25;
+        t4=x>0;
+        t5=t3&&t4;
+        ifnz t5 goto l1:
+\end{lstlisting}
+
+\subsection{Código Objeto Ensamblador Generado}
+El traductor produce el código x86 correspondiente en \texttt{salida.asm}:
+
+\begin{lstlisting}[language={[x86masm]Assembler}]
+section .bss
+    x resd 1
+    y resd 1
+    z resd 1
+    i resd 1
+    total resd 1
+
+section .text
+    global _start
+
+_start:
+l1:
+    mov eax, [total]
+    add eax, 1
+    mov [total], eax
+    mov eax, [x]
+    cmp eax, 25
+    setl al
+    movzx eax, al
+    mov ecx, [x]
+    cmp ecx, 0
+    setg cl
+    movzx ecx, cl
+    and eax, ecx
+    test eax, eax
+    jnz l1
+\end{lstlisting}
+
+\subsection{Análisis de Casos Límite (Suite de Trampas)}
+Se evaluaron los casos especiales presentes en \texttt{trampa1.txt} a \texttt{trampa7.txt}, los cuales pusieron a prueba:
+\begin{itemize}
+    \item Anidamiento profundo de condicionales \texttt{IF-THEN-ELSE}.
+    \item Saltos de línea inesperados o ausencia de los mismos al final del archivo.
+    \item Expresiones booleanas compuestas con operadores relacionales mixtos.
+    \item Identificadores no declarados o reutilización de etiquetas en bucles contiguos.
+\end{itemize}
+En todas las pruebas válidas, el compilador sintetizó el código intermedio de manera correcta sin incurrir en ambigüedades irresolubles en tiempo de análisis sintáctico.
+
+\section{Conclusiones y Trabajo Futuro}
+En este trabajo se demostró el diseño e implementación funcional de un compilador completo para el lenguaje EasyLang utilizando las herramientas estándar Flex y Bison acopladas a un generador de código en ensamblador x86 NASM.
+
+Las principales conclusiones derivadas del proyecto son:
+\begin{enumerate}
+    \item \textbf{Modularidad del pipeline:} El uso de Código de Tres Direcciones como puente intermedio simplificó sustancialmente la tarea de traducción final hacia ensamblador, aislando las complejidades gramaticales de las restricciones de la arquitectura x86.
+    \item \textbf{Gestión de flujo de control:} El empleo de estructuras semánticas en la unión de Bison (\texttt{IfInfo}, \texttt{ForInfo}) permitió un manejo limpio de las etiquetas de salto para bucles y condicionales anidados.
+    \item \textbf{Generación de Ensamblador x86:} El backend demostró ser eficiente para el conjunto de instrucciones del lenguaje, realizando una asignación estática clara en la sección \texttt{.bss} y mapeando comparaciones booleanas complejas mediante instrucciones canónicas (\texttt{cmp}, \texttt{setCC}, \texttt{movzx}).
+\end{enumerate}
+
+Como trabajo futuro se contempla:
+\begin{itemize}
+    \item Incorporar un algoritmo de asignación global de registros basado en coloración de grafos (algoritmo de Chaitin-Briggs).
+    \item Implementar soporte para tipos de datos adicionales (flotantes, cadenas y arreglos multidimensionales).
+    \item Desarrollar optimizaciones independientes de la máquina en el código intermedio, tales como eliminación de subexpresiones comunes y propagación de constantes.
+\end{itemize}
+
+\begin{thebibliography}{00}
+\bibitem{aho} A. V. Aho, M. S. Lam, R. Sethi, y J. D. Ullman, \textit{Compiladores: Principios, Técnicas y Herramientas}, 2da ed. Pearson Educación, 2008.
+\bibitem{levine} J. R. Levine, T. Mason, y D. Brown, \textit{lex \& yacc}, 2da ed. O'Reilly Media, 1992.
+\bibitem{nasm} H. P. Anvin et al., \textit{NASM - The Netwide Assembler: Manual}, versión 2.15, 2020.
+\bibitem{intel} Intel Corporation, \textit{Intel 64 and IA-32 Architectures Software Developer's Manual}, vol. 1: Basic Architecture, 2021.
+\bibitem{cooper} K. D. Cooper y L. Torczon, \textit{Engineering a Compiler}, 2da ed. Morgan Kaufmann, 2011.
+\end{thebibliography}
+
+\end{document}

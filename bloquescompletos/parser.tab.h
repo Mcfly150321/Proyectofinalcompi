@@ -50,6 +50,10 @@ extern int yydebug;
 typedef struct {
     char *l_false;
     char *l_end;
+<<<<<<< HEAD
+=======
+    int linea_inicio;
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
 } IfInfo;
 
 typedef struct {
@@ -57,9 +61,16 @@ typedef struct {
     char *limit;
     char *l_start;
     char *l_end;
+<<<<<<< HEAD
 } ForInfo;
 
 #line 63 "parser.tab.h"
+=======
+    int linea_inicio;
+} ForInfo;
+
+#line 65 "parser.tab.h"
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -114,6 +125,7 @@ typedef struct {
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
+<<<<<<< HEAD
 #line 57 "parser.y"
 
     char *str;
@@ -121,6 +133,16 @@ union YYSTYPE
     ForInfo for_info;
 
 #line 124 "parser.tab.h"
+=======
+#line 102 "parser.y"
+
+    char *str;
+    int num;
+    IfInfo if_info;
+    ForInfo for_info;
+
+#line 127 "parser.tab.h"
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
 
 };
 typedef union YYSTYPE YYSTYPE;
