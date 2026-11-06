@@ -1,0 +1,1 @@
+{"name":"easylang-web","version":"1.0.0","scripts":{"build":"sh analizador/build.sh","start":"node server.js"}}

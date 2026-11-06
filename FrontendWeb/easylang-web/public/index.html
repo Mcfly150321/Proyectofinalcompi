@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compilador EasyLang</title>
+<style>
+:root{color-scheme:light dark;--bg:#eef1f4;--pn:#fff;--ink:#1c2630;--mu:#66727f;--ln:#d3d9e0;--ac:#0b6b73;--acf:#fff;--er:#b3261e;--ok:#1b7a43;--wa:#8a5a00}
+@media(prefers-color-scheme:dark){:root{--bg:#12171c;--pn:#1a2128;--ink:#e5e9ed;--mu:#8b97a3;--ln:#2b343d;--ac:#4cb5bd;--acf:#08171a;--er:#ff8a80;--ok:#6fd49a;--wa:#e8b55a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px;background:var(--pn);border-bottom:1px solid var(--ln)}
+h1{font-size:17px;margin:0 auto 0 0;font-weight:650}
+button,select{font:inherit;padding:7px 13px;border:1px solid var(--ln);border-radius:6px;background:var(--pn);color:var(--ink);cursor:pointer}
+button.p{background:var(--ac);color:var(--acf);border-color:var(--ac);font-weight:600}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+#st{padding:8px 16px;font-size:13px;border-bottom:1px solid var(--ln);background:var(--pn);min-height:36px}
+#st.ok{color:var(--ok)}#st.er{color:var(--er)}#st .w{color:var(--wa);margin-left:12px}
+main{flex:1;display:grid;grid-template-columns:1fr;gap:12px;padding:12px}
+@media(min-width:900px){main{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;height:calc(100vh - 100px)}}
+section{background:var(--pn);border:1px solid var(--ln);border-radius:8px;display:flex;flex-direction:column;min-height:260px;min-width:0;overflow:hidden}
+section>h2{font-size:13px;font-weight:650;margin:0;padding:8px 12px;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:8px}
+section>h2 button{margin-left:auto;padding:3px 10px;font-size:12px}
+textarea,pre{flex:1;margin:0;padding:10px 12px;border:0;background:transparent;color:var(--ink);font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:none;overflow:auto;white-space:pre;tab-size:4;min-height:0}
+#run{display:flex;flex-direction:column;flex:1;min-height:0}
+#run label{font-size:12px;color:var(--mu);padding:6px 12px 0}
+#stdin{flex:none;height:54px;border-bottom:1px solid var(--ln)}
+#adet{border-bottom:1px solid var(--ln);padding:4px 12px;font-size:12px;color:var(--mu)}#ana{padding:6px 0;max-height:120px;color:var(--ink)}
+#vars{font-size:12px;color:var(--mu);padding:6px 12px;border-top:1px solid var(--ln)}
+.logo{height:46px;background:#fff;border-radius:6px;padding:2px}
+h1 small{font-weight:400;color:var(--mu);font-size:12px;margin-left:8px}
+.sep{flex:0 0 1px;align-self:stretch;background:var(--ln)}
+dialog{border:1px solid var(--ln);border-radius:10px;background:var(--pn);color:var(--ink);padding:20px 24px;min-width:min(420px,90vw)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h2{margin:8px 0 12px;font-size:16px}
+dialog ul{list-style:none;margin:0 0 16px;padding:0}
+dialog li{display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid var(--ln)}
+dialog li b{font-variant-numeric:tabular-nums;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <img class="logo" src="logo.png" alt="Universidad Mesoamericana (UMES)">
+  <h1>Compilador EasyLang <small id="fn">programa.el</small></h1>
+  <button id="open">Abrir .el</button><input type="file" id="file" accept=".el,.txt" hidden>
+  <button id="save">Guardar .el</button>
+  <select id="ex" aria-label="Cargar ejemplo"><option value="">Ejemplos…</option></select>
+  <span class="sep"></span>
+  <button id="b-tdc">Código intermedio</button>
+  <button id="b-asm">Generar ASM</button>
+  <button id="b-exe">Generar ejecutable</button>
+  <button class="p" id="b-run">Ejecutar</button>
+  <button id="b-team">Integrantes</button>
+</header>
+<dialog id="team">
+  <img class="logo" src="logo.png" alt="Universidad Mesoamericana (UMES)">
+  <h2>Integrantes</h2>
+  <ul>
+    <li><span>Juan Luis Cojtin Herrera</span><b>202408007</b></li>
+    <li><span>Sebastian Rodrigo Rodas Pineda</span><b>202408060</b></li>
+    <li><span>Arturo Alejandro Maldonado Orozco</span><b>202308110</b></li>
+  </ul>
+  <button class="p" id="tclose">Cerrar</button>
+</dialog>
+<div id="st">Escribe o abre un archivo .el y usa los botones de la barra superior.</div>
+<main>
+  <section><h2>Código fuente</h2><textarea id="src" spellcheck="false" aria-label="Código fuente"></textarea></section>
+  <section><h2>Código de tres direcciones (TDC)</h2><pre id="tdc"></pre></section>
+  <section><h2>Ensamblador (x86-64 NASM)<button id="dl" disabled>Descargar .asm</button></h2><pre id="asm"></pre></section>
+  <section><h2>Resultado de la ejecución</h2>
+    <div id="run">
+      <label for="stdin">Entradas para INPUT (separadas por espacio o salto de línea; si faltan, la ejecución se detiene)</label>
+      <textarea id="stdin" spellcheck="false"></textarea>
+      <details id="adet"><summary>Salida del analizador (C) y del ensamblador (NASM)</summary><pre id="ana"></pre></details>
+      <pre id="out"></pre>
+      
+    </div>
+  </section>
+</main>
+<script>
+const EX={
+"Suma con IF/ELSE":`MAIN
+ BEGIN
+    x:y:z ALLOCATE;
+    INPUT x;
+    INPUT y;
+    z:=1+x;
+    IF(x<y) THEN
+      BEGIN
+          z:=x+y;
+      END
+    ELSE
+      BEGIN
+          z:=0;
+      END
+   OUTPUT z;
+END
+`,
+"Factorial (FOR)":`MAIN
+ BEGIN
+    i:n:acumulador ALLOCATE;
+    INPUT n;
+    acumulador := 1;
+    FOR i := 1 to n do
+    BEGIN
+        acumulador := acumulador * i;
+    END
+    OUTPUT acumulador;
+ END
+`,
+"Acumulador (DO-WHILE)":`MAIN
+ BEGIN
+    contador:total ALLOCATE;
+    contador := 0;
+    total := 0;
+    DO
+        total := total + contador;
+        contador := contador + 1;
+    WHILE (contador < 10)
+    OUTPUT total;
+ END
+`,
+"Potencia (IF anidado)":`MAIN
+ BEGIN
+    base:expo:resultado ALLOCATE;
+    INPUT base;
+    INPUT expo;
+    IF (expo < 0) THEN
+    BEGIN
+        resultado := 0;
+    END
+    ELSE IF (expo == 0) THEN
+    BEGIN
+        resultado := 1;
+    END
+    ELSE
+    BEGIN
+        resultado := base ** expo;
+    END
+    OUTPUT resultado;
+ END
+`};
+
+/* ---------- Interfaz ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+let asmText="";
+
+function status(cls,html){const s=$("st");s.className=cls;s.innerHTML=html}
+function clearOut(){["tdc","asm","out","ana"].forEach(i=>$(i).textContent="");$("dl").disabled=true;asmText=""}
+
+function mark(l){
+  const ta=$("src"),ls=ta.value.split("\n"),pos=ls.slice(0,l-1).join("\n").length+(l>1?1:0);
+  ta.focus();ta.setSelectionRange(pos,pos+(ls[l-1]||"").length);
+}
+let built=null,fname="programa.el";
+async function step(s){
+  clearOut();status("","Procesando…");
+  const src=$("src").value;
+  let r;
+  try{
+    const res=await fetch("/api/compile",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({source:src,step:s,inputs:$("stdin").value,id:built&&built.src===src?built.id:null})});
+    r=await res.json();
+  }catch(e){status("er","No se pudo conectar con el servidor. Inícialo con «npm start» y abre http://localhost:3000");return}
+  const a=r.analyzer||{};
+  $("ana").textContent=[(a.output||"")+(a.errors?"\n"+a.errors:"")||a.error||"",r.build&&r.build.log].filter(Boolean).join("\n\n");
+  if(r.error||a.error){status("er",esc(r.error||a.error));return}
+  if(!a.ok){
+    status("er",`Error sintáctico${r.errorLine?" en la línea "+r.errorLine:""} (reportado por el analizador)`);
+    $("out").textContent="El analizador rechazó el programa. Revisa su salida arriba.";
+    $("adet").open=true;if(r.errorLine)mark(r.errorLine);return;
+  }
+  if(r.compileError){status("er",`Error en la línea ${r.compileError.l}: ${esc(r.compileError.msg)}`);mark(r.compileError.l);return}
+  if(r.tdc)$("tdc").textContent=r.tdc;
+  if(r.asm){asmText=r.asm;$("asm").textContent=asmText;$("dl").disabled=false}
+  const w=r.warns&&r.warns.length?`<span class="w">Avisos: ${esc(r.warns.join("; "))}</span>`:"";
+  if(r.build&&r.build.error){status("er",`No se pudo generar el ejecutable: ${esc(r.build.error)}`+w);$("adet").open=true;return}
+  if(r.build&&r.build.id)built={src,id:r.build.id};
+  if(r.run)$("out").textContent=(r.run.out||"(el programa no imprimió nada)")+(r.run.timeout?"\n[Tiempo de ejecución excedido]":"")+(r.run.code?`\n[Código de salida ${r.run.code}]`:"");
+  status("ok",{tdc:"Código intermedio generado.",asm:"Código ASM generado.",exe:"Ejecutable generado.",run:"Ejecución finalizada."}[s]+w);
+}
+function save(){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([$("src").value],{type:"text/plain"}));
+  a.download=fname;document.body.appendChild(a);a.click();a.remove();
+}
+const setName=n=>{fname=n;$("fn").textContent=n};
+
+Object.keys(EX).forEach(k=>$("ex").add(new Option(k,k)));
+$("ex").onchange=e=>{if(EX[e.target.value]){$("src").value=EX[e.target.value];clearOut();status("","Ejemplo cargado.")}e.target.value=""};
+$("open").onclick=()=>$("file").click();
+$("file").onchange=async e=>{const f=e.target.files[0];if(!f)return;$("src").value=await f.text();setName(f.name.replace(/\.\w+$/,"")+".el");clearOut();status("",`Archivo «${esc(f.name)}» cargado.`);e.target.value=""};
+[["tdc","tdc"],["asm","asm"],["exe","exe"],["run","run"]].forEach(([i,s])=>$("b-"+i).onclick=()=>step(s));
+$("save").onclick=save;
+$("b-team").onclick=()=>$("team").showModal();
+$("tclose").onclick=()=>$("team").close();
+$("src").addEventListener("keydown",e=>{
+  if(e.key=="Tab"){e.preventDefault();const t=e.target,s=t.selectionStart;t.setRangeText("    ",s,t.selectionEnd,"end")}
+  if((e.ctrlKey||e.metaKey)&&e.key=="Enter"){e.preventDefault();step("run")}
+  if((e.ctrlKey||e.metaKey)&&e.key=="s"){e.preventDefault();save()}
+});
+$("dl").onclick=()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([asmText],{type:"text/plain"}));
+  a.download=fname.replace(/\.el$/,"")+".asm";document.body.appendChild(a);a.click();a.remove();
+};
+$("src").value=EX["Suma con IF/ELSE"];
+</script>
+</body>
+</html>
