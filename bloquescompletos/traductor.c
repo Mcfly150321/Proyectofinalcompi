@@ -8,6 +8,11 @@ int total_vars = 0;
 
 char temp_eax[32] = "";
 char temp_ecx[32] = "";
+char var_en_eax[32] = "";
+char var_en_ecx[32] = "";
+int flags_listas_jnz = 0;
+int is_bool_eax = 0;
+int is_bool_ecx = 0;
 
 void agregar_var(const char *v) {
     for (int i = 0; i < total_vars; i++) {
@@ -64,54 +69,95 @@ void limpiar(char *s) {
     s[j] = '\0';
 }
 
-void emitir_cmp(FILE *out, const char *izq, const char *op1, const char *op2, const char *set_inst) {
+void emitir_cmp(FILE *out, const char *izq, const char *op1, const char *op2, const char *set_inst, const char *op_simb) {
     const char *reg32 = "eax";
     const char *reg8 = "al";
+
+    fprintf(out, "\n    ; condicion: %s %s %s\n", op1, op_simb, op2);
 
     if (temp_eax[0] != '\0' && strcmp(op1, temp_eax) != 0 && strcmp(op2, temp_eax) != 0) {
         reg32 = "ecx";
         reg8 = "cl";
         strcpy(temp_ecx, izq);
+        is_bool_ecx = 1;
+        if (strcmp(var_en_ecx, op1) != 0 && strcmp(op1, "ecx") != 0) {
+            fprintf(out, "    mov ecx, %s\n", op_asm(op1));
+        }
     } else {
         strcpy(temp_eax, izq);
+        is_bool_eax = 1;
+        if (strcmp(var_en_eax, op1) != 0 && strcmp(op1, "eax") != 0) {
+            fprintf(out, "    mov eax, %s\n", op_asm(op1));
+        }
     }
 
-    if (strcmp(op1, reg32) != 0) {
-        fprintf(out, "    mov %s, %s\n", reg32, op_asm(op1));
-    }
     fprintf(out, "    cmp %s, %s\n", reg32, op_asm(op2));
     fprintf(out, "    %s %s\n", set_inst, reg8);
-    fprintf(out, "    movzx %s, %s\n", reg32, reg8);
+    flags_listas_jnz = 0;
+    var_en_eax[0] = '\0';
+    var_en_ecx[0] = '\0';
 }
 
 void emitir_arit(FILE *out, const char *izq, const char *op1, const char *op2, const char *inst) {
     if (strcmp(op1, temp_eax) == 0 && strcmp(op2, temp_ecx) == 0) {
-        fprintf(out, "    %s eax, ecx\n", inst);
+        if (strcmp(inst, "and") == 0 || strcmp(inst, "or") == 0) {
+            fprintf(out, "    ; operar %s\n", inst);
+            fprintf(out, "    %s al, cl\n", inst);
+            flags_listas_jnz = 1;
+            is_bool_eax = 1;
+        } else {
+            fprintf(out, "    %s eax, ecx\n", inst);
+            flags_listas_jnz = 0;
+            is_bool_eax = 0;
+        }
         strcpy(temp_eax, izq);
         temp_ecx[0] = '\0';
+        is_bool_ecx = 0;
+        var_en_eax[0] = '\0';
+        var_en_ecx[0] = '\0';
         return;
     }
     if (strcmp(op1, temp_eax) == 0) {
         fprintf(out, "    %s eax, %s\n", inst, op_asm(op2));
         strcpy(temp_eax, izq);
+        flags_listas_jnz = 0;
+        is_bool_eax = 0;
+        var_en_eax[0] = '\0';
         return;
     }
     if (strcmp(op2, temp_eax) == 0) {
         fprintf(out, "    mov ecx, eax\n");
-        fprintf(out, "    mov eax, %s\n", op_asm(op1));
+        if (strcmp(var_en_eax, op1) != 0) {
+            fprintf(out, "    mov eax, %s\n", op_asm(op1));
+        }
         fprintf(out, "    %s eax, ecx\n", inst);
         strcpy(temp_eax, izq);
         temp_ecx[0] = '\0';
+        flags_listas_jnz = 0;
+        is_bool_eax = 0;
+        is_bool_ecx = 0;
+        var_en_eax[0] = '\0';
+        var_en_ecx[0] = '\0';
         return;
     }
     if (temp_eax[0] != '\0') {
-        fprintf(out, "    mov ecx, %s\n", op_asm(op1));
+        if (strcmp(var_en_ecx, op1) != 0) {
+            fprintf(out, "    mov ecx, %s\n", op_asm(op1));
+        }
         fprintf(out, "    %s ecx, %s\n", inst, op_asm(op2));
         strcpy(temp_ecx, izq);
+        flags_listas_jnz = 0;
+        is_bool_ecx = 0;
+        var_en_ecx[0] = '\0';
     } else {
-        fprintf(out, "    mov eax, %s\n", op_asm(op1));
+        if (strcmp(var_en_eax, op1) != 0) {
+            fprintf(out, "    mov eax, %s\n", op_asm(op1));
+        }
         fprintf(out, "    %s eax, %s\n", inst, op_asm(op2));
         strcpy(temp_eax, izq);
+        flags_listas_jnz = 0;
+        is_bool_eax = 0;
+        var_en_eax[0] = '\0';
     }
 }
 
@@ -178,14 +224,16 @@ int main(int argc, char **argv) {
         if (!*p || strncmp(p, "DECL", 4) == 0) continue;
 
         if (strcmp(p, "main:") == 0) { /*esto es main porque el tdc imprime main en su bloque, por eso comparamos con el bloque main*/
-            fprintf(out, "_start:\n");
+            fprintf(out, "_start:\n\n");
             continue;
         }
 
         if (p[0] == 'l' && isdigit(p[1]) && p[strlen(p)-1] == ':') {
-            fprintf(out, "%s\n", p);
+            fprintf(out, "\n%s\n", p);
             temp_eax[0] = '\0';
             temp_ecx[0] = '\0';
+            var_en_eax[0] = '\0';
+            var_en_ecx[0] = '\0';
             continue;
         }
 
@@ -193,9 +241,11 @@ int main(int argc, char **argv) {
         if (sscanf(p, "jmp %s", destino) == 1 || sscanf(p, "goto %s", destino) == 1) {
             limpiar(destino);
             if (destino[strlen(destino)-1] == ':') destino[strlen(destino)-1] = '\0';
-            fprintf(out, "    jmp %s\n", destino);
+            fprintf(out, "    jmp %s\n\n", destino);
             temp_eax[0] = '\0';
             temp_ecx[0] = '\0';
+            var_en_eax[0] = '\0';
+            var_en_ecx[0] = '\0';
             continue;
         }
 
@@ -203,19 +253,29 @@ int main(int argc, char **argv) {
         if (sscanf(p, "ifnz %s goto %s", cond_temp, lbl) == 2) {
             limpiar(lbl);
             if (lbl[strlen(lbl)-1] == ':') lbl[strlen(lbl)-1] = '\0';
-            fprintf(out, "    test eax, eax\n");
-            fprintf(out, "    jnz %s\n", lbl);
+            if (!flags_listas_jnz) {
+                fprintf(out, "    test al, al\n");
+            }
+            fprintf(out, "    jnz %s    ; salta si se cumple\n\n", lbl);
+            flags_listas_jnz = 0;
             temp_eax[0] = '\0';
             temp_ecx[0] = '\0';
+            var_en_eax[0] = '\0';
+            var_en_ecx[0] = '\0';
             continue;
         }
         if (sscanf(p, "ifz %s goto %s", cond_temp, lbl) == 2) {
             limpiar(lbl);
             if (lbl[strlen(lbl)-1] == ':') lbl[strlen(lbl)-1] = '\0';
-            fprintf(out, "    cmp eax, 0\n");
-            fprintf(out, "    je %s\n", lbl);
+            if (!flags_listas_jnz) {
+                fprintf(out, "    test al, al\n");
+            }
+            fprintf(out, "    jz %s    ; salta si no se cumple\n\n", lbl);
+            flags_listas_jnz = 0;
             temp_eax[0] = '\0';
             temp_ecx[0] = '\0';
+            var_en_eax[0] = '\0';
+            var_en_ecx[0] = '\0';
             continue;
         }
 
@@ -262,25 +322,25 @@ int main(int argc, char **argv) {
 
             if (strstr(d, "<=")) {
                 sscanf(d, "%[^<=]<=%s", op1, op2);
-                emitir_cmp(out, izq, op1, op2, "setle");
+                emitir_cmp(out, izq, op1, op2, "setle", "<=");
             } else if (strstr(d, ">=")) {
                 sscanf(d, "%[^>=]>=%s", op1, op2);
-                emitir_cmp(out, izq, op1, op2, "setge");
+                emitir_cmp(out, izq, op1, op2, "setge", ">=");
             } else if (strstr(d, "==")) {
                 sscanf(d, "%[^==]==%s", op1, op2);
-                emitir_cmp(out, izq, op1, op2, "sete");
+                emitir_cmp(out, izq, op1, op2, "sete", "==");
             } else if (strstr(d, "!=")) {
                 sscanf(d, "%[^!=]!=%s", op1, op2);
-                emitir_cmp(out, izq, op1, op2, "setne");
+                emitir_cmp(out, izq, op1, op2, "setne", "!=");
             } else if (strstr(d, "<>")) {
                 sscanf(d, "%[^<>]<>%s", op1, op2);
-                emitir_cmp(out, izq, op1, op2, "setne");
+                emitir_cmp(out, izq, op1, op2, "setne", "<>");
             } else if (strchr(d, '<')) {
                 sscanf(d, "%[^<]<%s", op1, op2);
-                emitir_cmp(out, izq, op1, op2, "setl");
+                emitir_cmp(out, izq, op1, op2, "setl", "<");
             } else if (strchr(d, '>')) {
                 sscanf(d, "%[^>]>%s", op1, op2);
-                emitir_cmp(out, izq, op1, op2, "setg");
+                emitir_cmp(out, izq, op1, op2, "setg", ">");
             } else if (strstr(d, "&&")) {
                 sscanf(d, "%[^&]&&%s", op1, op2);
                 emitir_arit(out, izq, op1, op2, "and");
@@ -312,17 +372,32 @@ int main(int argc, char **argv) {
             } else {
                 if (es_temp(d)) {
                     if (strcmp(d, temp_ecx) == 0) {
+                        if (is_bool_ecx) {
+                            fprintf(out, "    movzx ecx, cl\n");
+                            is_bool_ecx = 0;
+                        }
                         fprintf(out, "    mov [%s], ecx\n", izq);
+                        strcpy(var_en_ecx, izq);
                         temp_ecx[0] = '\0';
                     } else {
+                        if (is_bool_eax) {
+                            fprintf(out, "    movzx eax, al\n");
+                            is_bool_eax = 0;
+                        }
                         fprintf(out, "    mov [%s], eax\n", izq);
+                        strcpy(var_en_eax, izq);
                         temp_eax[0] = '\0';
                     }
                 } else if (es_numero(d)) {
                     fprintf(out, "    mov dword [%s], %s\n", izq, d);
+                    if (strcmp(var_en_eax, izq) == 0) var_en_eax[0] = '\0';
+                    if (strcmp(var_en_ecx, izq) == 0) var_en_ecx[0] = '\0';
                 } else {
-                    fprintf(out, "    mov eax, [%s]\n", d);
+                    if (strcmp(var_en_eax, d) != 0) {
+                        fprintf(out, "    mov eax, [%s]\n", d);
+                    }
                     fprintf(out, "    mov [%s], eax\n", izq);
+                    strcpy(var_en_eax, izq);
                     temp_eax[0] = '\0';
                 }
             }

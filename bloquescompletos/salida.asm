@@ -7,26 +7,30 @@ section .text
     global _start
 
 _start:
+
     mov dword [a], 0
     mov dword [i], 1
+
 l1:
     mov eax, [a]
-    add eax, 2
+    imul eax, [*2]
     mov [a], eax
     mov eax, [i]
     add eax, 1
     mov [i], eax
-    mov eax, [i]
+
+    ; condicion: i <= 2
     cmp eax, 2
     setle al
-    movzx eax, al
-    mov ecx, 1
+
+    ; condicion: a > 0
+    mov ecx, [a]
     cmp ecx, 0
     setg cl
-    movzx ecx, cl
-    and eax, ecx
-    test eax, eax
-    jnz l1
+    ; operar and
+    and al, cl
+    jnz l1    ; salta si se cumple
+
     mov eax, [a]
     mov [total], eax
 

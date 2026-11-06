@@ -4,8 +4,8 @@ BEGIN
   a:=0;
   i:=1;
   DO
-    a:=a+2;
+    a:=a**2;
     i := i  + 1;
-  WHILE(i<=2 AND 1>0)
+  WHILE(i<=2 AND a>0)
   total := a;
 END
