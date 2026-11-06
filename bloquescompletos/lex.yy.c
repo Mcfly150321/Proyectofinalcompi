@@ -385,9 +385,9 @@ struct yy_trans_info
 static const flex_int16_t yy_accept[91] =
     {   0,
         0,    0,   39,   37,   36,   35,   27,   28,    5,    2,
-        3,    4,    6,    6,   25,   26,   30,   37,   29,   23,
+        3,    4,    6,    6,   25,   26,   34,   37,   33,   23,
        23,   23,   23,   23,   23,   23,   23,   23,   23,   23,
-       23,   23,   36,    1,    6,   24,   32,   34,   33,   31,
+       23,   23,   36,    1,    6,   24,   30,   32,   31,   29,
        23,   23,   23,   23,   19,   23,   23,   23,   13,   23,
        23,    8,   23,   23,   18,   23,    0,   23,    7,   23,
        23,   17,   15,   23,   23,   23,   23,   23,    0,    0,
@@ -527,10 +527,11 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "lexer.l"
 #line 2 "lexer.l"
+#include <string.h>
 #include "parser.tab.h"
 int linea_actual = 1; 
-#line 532 "lex.yy.c"
 #line 533 "lex.yy.c"
+#line 534 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -747,9 +748,9 @@ YY_DECL
 		}
 
 	{
-#line 9 "lexer.l"
+#line 10 "lexer.l"
 
-#line 752 "lex.yy.c"
+#line 753 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -818,193 +819,193 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 10 "lexer.l"
-{ return TK_POTENCIACION; }
+#line 11 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_POTENCIACION; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 11 "lexer.l"
-{ return TK_SUMA; }
+#line 12 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_SUMA; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 12 "lexer.l"
-{ return TK_RESTA; }
+#line 13 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_RESTA; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 13 "lexer.l"
-{ return TK_DIVISION; }
+#line 14 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_DIVISION; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 14 "lexer.l"
-{ return TK_MULTIPLICACION; }
+#line 15 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_MULTIPLICACION; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 15 "lexer.l"
-{ return TK_NUMERO; }
+#line 16 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_NUMERO; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 16 "lexer.l"
+#line 17 "lexer.l"
 { return TK_AND; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 17 "lexer.l"
+#line 18 "lexer.l"
 { return TK_OR; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 18 "lexer.l"
+#line 19 "lexer.l"
 { return TK_ALLOCATE; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 19 "lexer.l"
+#line 20 "lexer.l"
 { return TK_MAIN; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 20 "lexer.l"
+#line 21 "lexer.l"
 { return TK_INPUT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 21 "lexer.l"
+#line 22 "lexer.l"
 { return TK_OUTPUT; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 22 "lexer.l"
+#line 23 "lexer.l"
 { return TK_IF; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 23 "lexer.l"
+#line 24 "lexer.l"
 { return TK_ELSE; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 24 "lexer.l"
-{return TK_FOR; }
+#line 25 "lexer.l"
+{ return TK_FOR; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 25 "lexer.l"
-{return TK_BEGIN;}
+#line 26 "lexer.l"
+{ return TK_BEGIN;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 26 "lexer.l"
-{return TK_END;}
+#line 27 "lexer.l"
+{ return TK_END;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 27 "lexer.l"
-{return TK_TO;}
+#line 28 "lexer.l"
+{ return TK_TO;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 28 "lexer.l"
-{return TK_DO;}
+#line 29 "lexer.l"
+{ return TK_DO;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 29 "lexer.l"
-{return TK_THEN;}
+#line 30 "lexer.l"
+{ return TK_THEN;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 30 "lexer.l"
-{return TK_WHILE;}
+#line 31 "lexer.l"
+{ return TK_WHILE;}
 	YY_BREAK
 case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
-#line 31 "lexer.l"
-{return TK_COMENTARIO;}
+#line 32 "lexer.l"
+{ return TK_COMENTARIO; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 32 "lexer.l"
-{ return TK_ID; }
+#line 33 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_ID; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 33 "lexer.l"
+#line 34 "lexer.l"
 { return TK_ASIG; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 34 "lexer.l"
+#line 35 "lexer.l"
 { return TK_DP; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 35 "lexer.l"
+#line 36 "lexer.l"
 { return TK_EOS; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 36 "lexer.l"
+#line 37 "lexer.l"
 { return TK_PAB; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 37 "lexer.l"
+#line 38 "lexer.l"
 { return TK_PCE; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 38 "lexer.l"
-{ return TK_MAY; }
+#line 39 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_MAIG; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 39 "lexer.l"
-{ return TK_MEN; }
+#line 40 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_MEIG; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 40 "lexer.l"
-{ return TK_MAIG; }
+#line 41 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_IG; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 41 "lexer.l"
-{ return TK_MEIG; }
+#line 42 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_NIG; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 42 "lexer.l"
-{ return TK_IG; }
+#line 43 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_MAY; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 43 "lexer.l"
-{ return TK_NIG; }
+#line 44 "lexer.l"
+{ yylval.str = strdup(yytext); return TK_MEN; }
 	YY_BREAK
 case 35:
 /* rule 35 can match eol */
 YY_RULE_SETUP
-#line 44 "lexer.l"
+#line 45 "lexer.l"
 { linea_actual++; return NEWLINE; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 45 "lexer.l"
+#line 46 "lexer.l"
 { /* ignorar espacios */ }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 46 "lexer.l"
+#line 47 "lexer.l"
 { return yytext[0]; }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 47 "lexer.l"
+#line 48 "lexer.l"
 {
     static int enviado = 0;
     if (!enviado) {
@@ -1017,10 +1018,10 @@ case YY_STATE_EOF(INITIAL):
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 56 "lexer.l"
+#line 57 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 1023 "lex.yy.c"
+#line 1024 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2035,7 +2036,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 56 "lexer.l"
-
-
+#line 57 "lexer.l"
 

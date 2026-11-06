@@ -44,6 +44,24 @@
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 1 "parser.y"
+
+typedef struct {
+    char *l_false;
+    char *l_end;
+    int linea_inicio;
+} IfInfo;
+
+typedef struct {
+    char *var;
+    char *limit;
+    char *l_start;
+    char *l_end;
+    int linea_inicio;
+} ForInfo;
+
+#line 65 "parser.tab.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -61,14 +79,14 @@ extern int yydebug;
     TK_POTENCIACION = 262,         /* TK_POTENCIACION  */
     TK_NUMERO = 263,               /* TK_NUMERO  */
     TK_ID = 264,                   /* TK_ID  */
-    TK_PAB = 265,                  /* TK_PAB  */
-    TK_PCE = 266,                  /* TK_PCE  */
-    TK_MAY = 267,                  /* TK_MAY  */
-    TK_MEN = 268,                  /* TK_MEN  */
-    TK_MAIG = 269,                 /* TK_MAIG  */
-    TK_MEIG = 270,                 /* TK_MEIG  */
-    TK_IG = 271,                   /* TK_IG  */
-    TK_NIG = 272,                  /* TK_NIG  */
+    TK_MAY = 265,                  /* TK_MAY  */
+    TK_MEN = 266,                  /* TK_MEN  */
+    TK_MAIG = 267,                 /* TK_MAIG  */
+    TK_MEIG = 268,                 /* TK_MEIG  */
+    TK_IG = 269,                   /* TK_IG  */
+    TK_NIG = 270,                  /* TK_NIG  */
+    TK_PAB = 271,                  /* TK_PAB  */
+    TK_PCE = 272,                  /* TK_PCE  */
     TK_AND = 273,                  /* TK_AND  */
     TK_OR = 274,                   /* TK_OR  */
     TK_ASIG = 275,                 /* TK_ASIG  */
@@ -88,14 +106,27 @@ extern int yydebug;
     TK_END = 289,                  /* TK_END  */
     TK_WHILE = 290,                /* TK_WHILE  */
     TK_COMENTARIO = 291,           /* TK_COMENTARIO  */
-    NEWLINE = 292                  /* NEWLINE  */
+    NEWLINE = 292,                 /* NEWLINE  */
+    REDUCE_NO_ELSE = 293           /* REDUCE_NO_ELSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 60 "parser.y"
+
+    char *str;
+    int num;
+    IfInfo if_info;
+    ForInfo for_info;
+
+#line 127 "parser.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

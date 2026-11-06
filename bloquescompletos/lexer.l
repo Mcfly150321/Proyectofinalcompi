@@ -1,4 +1,5 @@
 %{
+#include <string.h>
 #include "parser.tab.h"
 int linea_actual = 1; 
 %}
@@ -7,12 +8,12 @@ int linea_actual = 1;
 %option yylineno
 
 %%
-"**"        { return TK_POTENCIACION; }
-"+"         { return TK_SUMA; }
-"-"         { return TK_RESTA; }
-"/"         { return TK_DIVISION; }
-"*"         { return TK_MULTIPLICACION; }
-0|[1-9][0-9]*  { return TK_NUMERO; }
+"**"        { yylval.str = strdup(yytext); return TK_POTENCIACION; }
+"+"         { yylval.str = strdup(yytext); return TK_SUMA; }
+"-"         { yylval.str = strdup(yytext); return TK_RESTA; }
+"/"         { yylval.str = strdup(yytext); return TK_DIVISION; }
+"*"         { yylval.str = strdup(yytext); return TK_MULTIPLICACION; }
+0|[1-9][0-9]*  { yylval.str = strdup(yytext); return TK_NUMERO; }
 "AND"       { return TK_AND; }
 "OR"        { return TK_OR; }
 "ALLOCATE"  { return TK_ALLOCATE; }
@@ -21,26 +22,26 @@ int linea_actual = 1;
 "OUTPUT"    { return TK_OUTPUT; }
 "IF"        { return TK_IF; }
 "ELSE"      { return TK_ELSE; }
-"FOR" {return TK_FOR; }
-"BEGIN" {return TK_BEGIN;}
-"END" {return TK_END;}
-"TO"|"to" {return TK_TO;}
-"DO"|"do" {return TK_DO;}
-"THEN" {return TK_THEN;}
-"WHILE" {return TK_WHILE;}
-\*{3}([^*]|\*[^*]|\*\*[^*])*\*{3} {return TK_COMENTARIO;}
-[a-zA-Z_][a-zA-Z0-9_]*  { return TK_ID; }
+"FOR"       { return TK_FOR; }
+"BEGIN"     { return TK_BEGIN;}
+"END"       { return TK_END;}
+"TO"|"to"   { return TK_TO;}
+"DO"|"do"   { return TK_DO;}
+"THEN"      { return TK_THEN;}
+"WHILE"     { return TK_WHILE;}
+\*{3}([^*]|\*[^*]|\*\*[^*])*\*{3} { return TK_COMENTARIO; }
+[a-zA-Z_][a-zA-Z0-9_]*  { yylval.str = strdup(yytext); return TK_ID; }
 ":="        { return TK_ASIG; }
 ":"         { return TK_DP; }
 ";"         { return TK_EOS; }
 "("         { return TK_PAB; }
 ")"         { return TK_PCE; }
-">"         { return TK_MAY; }
-"<"         { return TK_MEN; }
-">="        { return TK_MAIG; }
-"<="        { return TK_MEIG; }
-"=="        { return TK_IG; }
-"<>"        { return TK_NIG; }
+">="        { yylval.str = strdup(yytext); return TK_MAIG; }
+"<="        { yylval.str = strdup(yytext); return TK_MEIG; }
+"=="        { yylval.str = strdup(yytext); return TK_IG; }
+"<>"        { yylval.str = strdup(yytext); return TK_NIG; }
+">"         { yylval.str = strdup(yytext); return TK_MAY; }
+"<"         { yylval.str = strdup(yytext); return TK_MEN; }
 "\n"        { linea_actual++; return NEWLINE; }
 [ \t\r]+    { /* ignorar espacios */ }
 .           { return yytext[0]; }
@@ -54,4 +55,3 @@ int linea_actual = 1;
     yyterminate();
 }
 %%
-
