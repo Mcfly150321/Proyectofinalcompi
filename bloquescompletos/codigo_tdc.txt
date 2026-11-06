@@ -10,7 +10,5 @@ l1:
         t2=i+1;
         i=t2;
         t3=i<=2;
-        t4=a>0;
-        t5=t3&&t4;
-        ifnz t5 goto l1:
+        ifnz t3 goto l1:
         total=a;

@@ -22,13 +22,7 @@ l1:
     ; condicion: i <= 2
     cmp eax, 2
     setle al
-
-    ; condicion: a > 0
-    mov ecx, [a]
-    cmp ecx, 0
-    setg cl
-    ; operar and
-    and al, cl
+    test al, al
     jnz l1    ; salta si se cumple
 
     mov eax, [a]

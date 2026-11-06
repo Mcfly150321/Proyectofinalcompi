@@ -55,6 +55,48 @@ int foropen = 0;
 int thenopen = 0;
 int ifopen = 0;
 int iniciowhile = 0;
+
+typedef struct {
+    char nombre[64];
+    int declarada;
+    int usada;
+    int linea_declaracion;
+} Simbolo;
+
+Simbolo tabla_simbolos[200];
+int total_simbolos = 0;
+int hay_error_semantico = 0;
+
+void declarar_var(const char *nombre, int linea) {
+    for (int i = 0; i < total_simbolos; i++) {
+        if (strcmp(tabla_simbolos[i].nombre, nombre) == 0) return;
+    }
+    strcpy(tabla_simbolos[total_simbolos].nombre, nombre);
+    tabla_simbolos[total_simbolos].declarada = 1;
+    tabla_simbolos[total_simbolos].usada = 0;
+    tabla_simbolos[total_simbolos].linea_declaracion = linea;
+    total_simbolos++;
+}
+
+void usar_var(const char *nombre, int linea) {
+    for (int i = 0; i < total_simbolos; i++) {
+        if (strcmp(tabla_simbolos[i].nombre, nombre) == 0) {
+            tabla_simbolos[i].usada = 1;
+            return;
+        }
+    }
+    hay_error_semantico = 1;
+    printf(" -> LINEA %d: ERROR SEMÁNTICO: Variable '%s' no ha sido declarada.\n", linea, nombre);
+}
+
+void revisar_variables_no_usadas(void) {
+    for (int i = 0; i < total_simbolos; i++) {
+        if (tabla_simbolos[i].declarada && !tabla_simbolos[i].usada) {
+            printf(" -> LINEA %d: AVISO (WARNING): Variable '%s' declarada pero nunca fue usada.\n",
+                   tabla_simbolos[i].linea_declaracion, tabla_simbolos[i].nombre);
+        }
+    }
+}
 }
 
 %union {
@@ -76,7 +118,7 @@ int iniciowhile = 0;
 %token TK_COMENTARIO
 %token NEWLINE
 
-%type <str> variable numero oparit simarit operador factores
+%type <str> variable variable_decl numero oparit simarit operador factores
 %type <str> condicion logica simlog
 %type <if_info> if_encabezado
 %type <for_info> encabezado_for
@@ -97,7 +139,9 @@ bloque:
     TK_MAIN opt_inicio TK_BEGIN {
         emitir("main:\n");
     } cuerpo TK_END opt_inicio {
-        printf("\nBloque valido codigo completo\n");
+        if (!hay_error_semantico) {
+            printf("\nBloque valido codigo completo\n");
+        }
     }
     ;
 
@@ -405,12 +449,12 @@ declarar:
     ;
 
 declaracion:
-    variable { emitir("        DECL %s\n", $1); } lista_ids allocate eos
+    variable_decl lista_ids allocate eos
     ;
 
 lista_ids:
     %empty
-  | dospuntos variable { emitir("        DECL %s\n", $2); } lista_ids
+  | dospuntos variable_decl lista_ids
   ;
 
 then:
@@ -442,7 +486,18 @@ end:
     ;
 
 variable:
-    TK_ID { $$ = $1; }
+    TK_ID {
+        usar_var($1, linea_actual);
+        $$ = $1;
+    }
+    ;
+
+variable_decl:
+    TK_ID {
+        declarar_var($1, linea_actual);
+        emitir("        DECL %s\n", $1);
+        $$ = $1;
+    }
     ;
 
 numero:
@@ -530,19 +585,24 @@ int main(int argc, char **argv) {
     printf("Ingrese cadenas para evaluar:\n\n");
 
     yyparse();
+    revisar_variables_no_usadas();
 
     if (archivo_tdc) {
         fflush(archivo_tdc);
         rewind(archivo_tdc);
-        printf("\n=====================================================\n");
-        printf("       CÓDIGO DE TRES DIRECCIONES (TDC) GENERADO     \n");
-        printf("=====================================================\n\n");
-        char linea_buf[256];
-        while (fgets(linea_buf, sizeof(linea_buf), archivo_tdc)) {
-            printf("%s", linea_buf);
+        if (!hay_error_semantico) {
+            printf("\n=====================================================\n");
+            printf("       CÓDIGO DE TRES DIRECCIONES (TDC) GENERADO     \n");
+            printf("=====================================================\n\n");
+            char linea_buf[256];
+            while (fgets(linea_buf, sizeof(linea_buf), archivo_tdc)) {
+                printf("%s", linea_buf);
+            }
+            printf("\n[TDC guardado exitosamente en: %s]\n", nombre_salida);
+        } else {
+            printf("\n[TDC no generado debido a errores semanticos]\n");
         }
         fclose(archivo_tdc);
-        printf("\n[TDC guardado exitosamente en: %s]\n", nombre_salida);
     }
 
     return 0;
