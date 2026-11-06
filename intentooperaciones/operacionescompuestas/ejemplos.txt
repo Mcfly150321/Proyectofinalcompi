@@ -1,3 +1,7 @@
+a:b ALLOCATE;
+a ALLOCATE;
+a:b:c ALLOCATE;
+DEC a, b;
 5 + 3
 10 - 4
 5+3+5
@@ -28,6 +32,11 @@ MAIN
 ALLOCATE
 INPUT
 OUTPUT
+<<<<<<< HEAD
+DEC $a, $b;
+DEC $a, $c;
+DEC a, b;
+=======
 FOR i := 1 TO 7 DO
 BEGIN
 total := 1;
@@ -155,3 +164,4 @@ IF (X==15)
   c := c ** 2;
 d := 0;
 END
+>>>>>>> e75d46e6879ddfdb1be0c81107fe128486fba4dd

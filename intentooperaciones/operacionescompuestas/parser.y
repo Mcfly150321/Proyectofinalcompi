@@ -377,6 +377,15 @@ definicion:
     definir numero{
         c_definicion++;
     }
+  | declaracion NEWLINE {
+        printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual - 1);
+    }
+  | declaracion { 
+        printf(" -> LINEA %d: CADENA VÁLIDA: DECLARACIÓN\n", linea_actual - 1);
+    }
+  | NEWLINE        { /* ignorar líneas vacías */ }
+  | error NEWLINE  { printf(" -> LINEA %d: CADENA INVÁLIDA\n", linea_actual - 1); yyerrok; }
+  ;
     ;
 originalmente el newline esta definido hasta el bloque comparar, quuizas convendria, para usar comparacion en  otras partes, mover el newline
 al bloque de segurvariable por temas de que la comparacuon consuma la sentencia de comparaciion sin precisar saltos de linea 
@@ -403,13 +412,15 @@ extension:
   | extension division { contador++; c_divi++; }
   | extension potenciacion { contador++; c_expo++; }
   ;
-  
 
 suma:
      sumar operador
   ;
 resta:
     restar operador
+;
+restar:
+    TK_RESTA
 ;
 multuplicacion:
     multiplicar operador
@@ -420,8 +431,25 @@ division:
 potenciacion:
     potenciar operador
   ;
+potenciar:
+    TK_POTENCIACION
+  ;
+
+operador:
+    TK_NUMERO
+  | TK_ID
+  ;
 
 */
+
+declaracion:
+    TK_ID lista_ids TK_ALLOCATE TK_EOS
+  ;
+
+lista_ids:
+    %empty
+  | TK_DP TK_ID lista_ids
+  ;
 
 %%
 
@@ -477,7 +505,6 @@ int main(void) {
     printf("=====================================================\n");
     printf("   ANALIZADOR SINTÁCTICO DE SUMAS EN EASYLANG    \n");
     printf("=====================================================\n");
-    printf("Ingrese cadenas para evaluar:\n\n");
     yyparse();
     return 0;
 }

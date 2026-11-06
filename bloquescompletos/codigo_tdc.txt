@@ -1,4 +1,47 @@
 main:
+<<<<<<< HEAD
+        call input;
+        pop x;
+        call input;
+        pop y;
+        t1=1+x;
+        z=t1;
+l1:
+        t2=total+1;
+        total=t2;
+        t3=x<25;
+        t4=x>0;
+        t5=t3&&t4;
+        ifnz t5 goto l1:
+        i=10;
+l2:
+        t6=i<=-1;
+        ifz t6 goto l3:
+        t7=total+i;
+        total=t7;
+        t8=2**z;
+        x=t8;
+        t9=i+1;
+        i=t9;
+        jmp l2
+l3:
+        t10=x<y;
+        ifz t10 goto l4:
+        t11=x+y;
+        z=t11;
+        t12=x<10;
+        ifz t12 goto l6:
+        t13=x+y;
+        z=t13;
+        jmp l7
+l6:
+l7:
+        jmp l5
+l4:
+        z=0;
+l5:
+        push z;
+=======
         DECL a
         DECL b
         call input;
@@ -7,4 +50,5 @@ main:
         t2=t1+b;
         a=t2;
         push a;
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
         call output;

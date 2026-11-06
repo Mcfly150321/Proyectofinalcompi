@@ -21,6 +21,9 @@ int linea_actual = 1;
 "OUTPUT"    { return TK_OUTPUT; }
 "IF"        { return TK_IF; }
 "ELSE"      { return TK_ELSE; }
+<<<<<<< HEAD
+[a-zA-Z][a-zA-Z0-9_]*  { return TK_ID; }
+=======
 "FOR" {return TK_FOR; }
 "BEGIN" {return TK_BEGIN;}
 "END" {return TK_END;}
@@ -28,9 +31,11 @@ int linea_actual = 1;
 "DO" {return TK_DO;}
 "WHILE" {return TK_WHILE;}
 [a-zA-Z_][a-zA-Z0-9_]*  { return TK_ID; }
+>>>>>>> e75d46e6879ddfdb1be0c81107fe128486fba4dd
 ":="        { return TK_ASIG; }
 ":"         { return TK_DP; }
 ";"         { return TK_EOS; }
+":"         { return TK_DP; }
 "("         { return TK_PAB; }
 ")"         { return TK_PCE; }
 ">"         { return TK_MAY; }

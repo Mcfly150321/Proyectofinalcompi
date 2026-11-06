@@ -2,7 +2,10 @@
 typedef struct {
     char *l_false;
     char *l_end;
+<<<<<<< HEAD
+=======
     int linea_inicio;
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
 } IfInfo;
 
 typedef struct {
@@ -10,7 +13,10 @@ typedef struct {
     char *limit;
     char *l_start;
     char *l_end;
+<<<<<<< HEAD
+=======
     int linea_inicio;
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
 } ForInfo;
 }
 
@@ -27,12 +33,44 @@ void yyerror(const char *s);
 FILE *archivo_tdc = NULL;
 
 void emitir(const char *formato, ...) {
+<<<<<<< HEAD
+    va_list args;
+    va_start(args, formato);
+    vprintf(formato, args);
+    va_end(args);
+
+    if (archivo_tdc) {
+=======
     if (archivo_tdc) {
         va_list args;
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
         va_start(args, formato);
         vfprintf(archivo_tdc, formato, args);
         va_end(args);
     }
+<<<<<<< HEAD
+}
+
+int num_temp = 1;
+char* nuevo_temp(void) {
+    char buf[32];
+    sprintf(buf, "t%d", num_temp++);
+    return strdup(buf);
+}
+
+int num_label = 1;
+char* nueva_label(void) {
+    char buf[32];
+    sprintf(buf, "l%d", num_label++);
+    return strdup(buf);
+}
+
+extern int linea_actual;
+}
+
+%union {
+    char *str;
+=======
 }
 
 int num_temp = 1;
@@ -102,6 +140,7 @@ void revisar_variables_no_usadas(void) {
 %union {
     char *str;
     int num;
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
     IfInfo if_info;
     ForInfo for_info;
 }
@@ -118,12 +157,19 @@ void revisar_variables_no_usadas(void) {
 %token TK_COMENTARIO
 %token NEWLINE
 
+<<<<<<< HEAD
+%type <str> variable numero oparit simarit operador factores
+=======
 %type <str> variable variable_decl numero oparit simarit operador factores
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
 %type <str> condicion logica simlog
 %type <if_info> if_encabezado
 %type <for_info> encabezado_for
 %type <str> bloque1dw
+<<<<<<< HEAD
+=======
 %type <num> if for do end bloque_begin_end if_ramas
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
 
 %precedence REDUCE_NO_ELSE
 %precedence NEWLINE
@@ -138,11 +184,15 @@ programa:
 bloque:
     TK_MAIN opt_inicio TK_BEGIN {
         emitir("main:\n");
+<<<<<<< HEAD
+    } cuerpo TK_END opt_inicio
+=======
     } cuerpo TK_END opt_inicio {
         if (!hay_error_semantico) {
             printf("\nBloque valido codigo completo\n");
         }
     }
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
     ;
 
 opt_inicio:
@@ -176,6 +226,132 @@ operacion:
   ;
 
 comentario:
+<<<<<<< HEAD
+    TK_COMENTARIO
+    ;
+
+lectura:
+    leer
+    ;
+
+leer:
+    input variable eos {
+        emitir("        call input;\n");
+        emitir("        pop %s;\n", $2);
+    }
+    ;
+
+impresion:
+    imprimir
+    ;
+
+imprimir:
+    output variable eos {
+        emitir("        push %s;\n", $2);
+        emitir("        call output;\n");
+    }
+    ;
+
+output:
+    TK_OUTPUT
+    ;
+
+input:
+    TK_INPUT
+    ;
+
+expresion:
+    logica NEWLINE
+  | aritmetica NEWLINE
+  ;
+
+aritmetica:
+    oparit eos
+    ;
+
+oparit:
+    oparit simarit operador {
+        char *t = nuevo_temp();
+        emitir("        %s=%s%s%s;\n", t, $1, $2, $3);
+        $$ = t;
+    }
+  | operador {
+        $$ = $1;
+    }
+  ;
+
+simarit:
+    sumar         { $$ = "+"; }
+  | restar        { $$ = "-"; }
+  | multiplicar   { $$ = "*"; }
+  | dividir       { $$ = "/"; }
+  | potenciar     { $$ = "**"; }
+  ;
+
+logica:
+    operador simlog operador {
+        char *t = nuevo_temp();
+        emitir("        %s=%s%s%s;\n", t, $1, $2, $3);
+        $$ = t;
+    }
+  | logica TK_AND operador simlog operador {
+        char *t_rel = nuevo_temp();
+        emitir("        %s=%s%s%s;\n", t_rel, $3, $4, $5);
+        char *t_and = nuevo_temp();
+        emitir("        %s=%s&&%s;\n", t_and, $1, t_rel);
+        $$ = t_and;
+    }
+  | logica TK_OR operador simlog operador {
+        char *t_rel = nuevo_temp();
+        emitir("        %s=%s%s%s;\n", t_rel, $3, $4, $5);
+        char *t_or = nuevo_temp();
+        emitir("        %s=%s||%s;\n", t_or, $1, t_rel);
+        $$ = t_or;
+    }
+  ;
+
+simlog:
+    TK_MAY   { $$ = ">"; }
+  | TK_MEN   { $$ = "<"; }
+  | TK_MAIG  { $$ = ">="; }
+  | TK_MEIG  { $$ = "<="; }
+  | TK_IG    { $$ = "=="; }
+  | TK_NIG   { $$ = "<>"; }
+  ;
+
+definicion:
+    variable definir oparit eos {
+        emitir("        %s=%s;\n", $1, $3);
+    }
+    ;
+
+condicionar:
+    condicion NEWLINE
+    ;
+
+condicion:
+    agrupa1 logica agrupa2 {
+        $$ = $2;
+    }
+    ;
+
+agrupa1:
+    TK_PAB
+    ;
+
+agrupa2:
+    TK_PCE
+    ;
+
+/* --- CICLO FOR --- */
+ciclofor:
+    encabezado_for bloque_begin_end {
+        char *t_inc = nuevo_temp();
+        emitir("        %s=%s+1;\n", t_inc, $1.var);
+        emitir("        %s=%s;\n", $1.var, t_inc);
+        emitir("        jmp %s\n", $1.l_start);
+        emitir("%s:\n", $1.l_end);
+=======
     TK_COMENTARIO {
         printf(" -> LINEA %d: CADENA VÁLIDA: comentario\n", linea_actual);
     }
@@ -192,6 +368,7 @@ leer:
         if (whileopen == 0 && foropen == 0 && thenopen == 0) {
             printf(" -> LINEA %d: CADENA VÁLIDA: LECTURA DE VARIABLE\n", linea_actual);
         }
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
     }
     ;
 
@@ -311,6 +488,10 @@ for:
 
 encabezado_for:
     for variable definir operador to operador do opt_nl {
+<<<<<<< HEAD
+        /* $2 es var, $4 es valor inicial, $6 es límite */
+=======
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
         emitir("        %s=%s;\n", $2, $4);
         char *l_start = nueva_label();
         char *l_end = nueva_label();
@@ -318,6 +499,42 @@ encabezado_for:
         char *t_cond = nuevo_temp();
         emitir("        %s=%s<=%s;\n", t_cond, $2, $6);
         emitir("        ifz %s goto %s:\n", t_cond, l_end);
+<<<<<<< HEAD
+
+        $$.var = $2;
+        $$.limit = $6;
+        $$.l_start = l_start;
+        $$.l_end = l_end;
+    }
+    ;
+
+/* --- CICLO DO-WHILE --- */
+dowhile:
+    bloque1dw bloque2dw while condicion {
+        emitir("        ifnz %s goto %s:\n", $4, $1);
+    }
+    ;
+
+bloque1dw:
+    do opt_nl {
+        char *l_start = nueva_label();
+        emitir("%s:\n", l_start);
+        $$ = l_start;
+    }
+    ;
+
+bloque2dw:
+    instrucciones masinstrucciones
+    ;
+
+/* --- CICLO IF / ELSE --- */
+cicloif:
+    if_encabezado bloque_begin_end {
+        emitir("        jmp %s\n", $1.l_end);
+        emitir("%s:\n", $1.l_false);
+    } if_ramas {
+        emitir("%s:\n", $1.l_end);
+=======
 
         $$.var = $2;
         $$.limit = $6;
@@ -325,6 +542,7 @@ encabezado_for:
         $$.l_end = l_end;
         $$.linea_inicio = $1;
         foropen++;
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
     }
     ;
 
@@ -379,6 +597,8 @@ if_encabezado:
         emitir("        ifz %s goto %s:\n", $2, l_false);
         $$.l_false = l_false;
         $$.l_end = l_end;
+<<<<<<< HEAD
+=======
         $$.linea_inicio = $1;
         ifopen++;
     }
@@ -396,6 +616,7 @@ cicloif:
         } else {
             printf("-> LINEAS %d-%d: CADENA VALIDA: CICLO IF\n", $1.linea_inicio, $2);
         }
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
     }
     ;
 
@@ -404,6 +625,10 @@ cuerpo_instrucciones:
     ;
 
 if_ramas:
+<<<<<<< HEAD
+    %empty %prec REDUCE_NO_ELSE
+  | else opt_nl bloque_begin_end
+=======
     %empty %prec REDUCE_NO_ELSE {
         $$ = 0;
     }
@@ -418,6 +643,7 @@ if_ramas:
         ifopen--;
         $$ = ($6 > 0) ? $6 : $4;
     }
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
   ;
 
 instrucciones:
@@ -437,6 +663,17 @@ masinstrucciones:
   ;
 
 bloque_begin_end:
+<<<<<<< HEAD
+    begin opt_nl cuerpo_instrucciones end opt_nl
+    ;
+
+declarar:
+    declaracion
+    ;
+
+declaracion:
+    variable lista_ids allocate eos
+=======
     begin opt_nl cuerpo_instrucciones end opt_nl {
         $$ = $4;
     }
@@ -450,6 +687,7 @@ declarar:
 
 declaracion:
     variable_decl lista_ids allocate eos
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
     ;
 
 lista_ids:
@@ -458,15 +696,28 @@ lista_ids:
   ;
 
 then:
+<<<<<<< HEAD
+    TK_THEN
+=======
     TK_THEN { thenopen = 1; }
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
     ;
 
 begin:
     TK_BEGIN
     ;
 
+<<<<<<< HEAD
+if:
+    TK_IF
+    ;
+
+else:
+    TK_ELSE
+=======
 else:
     TK_ELSE { thenopen = 1; }
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
     ;
 
 dospuntos:
@@ -477,11 +728,29 @@ eos:
     TK_EOS
     ;
 
+<<<<<<< HEAD
+for:
+    TK_FOR
+    ;
+
+do:
+    TK_DO
+    ;
+
+=======
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
 to:
     TK_TO
     ;
 
 end:
+<<<<<<< HEAD
+    TK_END
+    ;
+
+variable:
+    TK_ID { $$ = $1; }
+=======
     TK_END { thenopen = 0; $$ = linea_actual; }
     ;
 
@@ -498,6 +767,7 @@ variable_decl:
         emitir("        DECL %s\n", $1);
         $$ = $1;
     }
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
     ;
 
 numero:
@@ -574,11 +844,22 @@ int main(int argc, char **argv) {
         nombre_salida = argv[1];
     }
 
+<<<<<<< HEAD
+    archivo_tdc = fopen(nombre_salida, "w");
+=======
     archivo_tdc = fopen(nombre_salida, "w+");
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
     if (!archivo_tdc) {
         fprintf(stderr, "Aviso: No se pudo abrir %s para escribir TDC.\n", nombre_salida);
     }
 
+<<<<<<< HEAD
+    yyparse();
+
+    if (archivo_tdc) {
+        fclose(archivo_tdc);
+        printf("\n[TDC guardado exitosamente en: %s]\n", nombre_salida);
+=======
     printf("=====================================================\n");
     printf("   ANALIZADOR SINTÁCTICO DE SUMAS EN EASYLANG    \n");
     printf("=====================================================\n");
@@ -603,6 +884,7 @@ int main(int argc, char **argv) {
             printf("\n[TDC no generado debido a errores semanticos]\n");
         }
         fclose(archivo_tdc);
+>>>>>>> 29890a0707a3dd3e9efc89f83db0077a63784b21
     }
 
     return 0;
