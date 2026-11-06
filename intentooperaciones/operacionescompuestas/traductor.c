@@ -98,6 +98,50 @@ void emitir_cmp(FILE *out, const char *izq, const char *op1, const char *op2, co
     var_en_ecx[0] = '\0';
 }
 
+void emitir_potencia(FILE *out, const char *izq, const char *op1, const char *op2) {
+    static int num_pow = 1;
+    int p_id = num_pow++;
+
+    fprintf(out, "\n    ; potencia: %s = %s ** %s\n", izq, op1, op2);
+
+    if (strcmp(op2, temp_eax) == 0 && strcmp(op1, temp_ecx) == 0) {
+        fprintf(out, "    mov edx, eax\n");
+        fprintf(out, "    mov ebx, ecx\n");
+        fprintf(out, "    mov ecx, edx\n");
+    } else if (strcmp(op1, temp_eax) == 0) {
+        fprintf(out, "    mov ebx, eax\n");
+        fprintf(out, "    mov ecx, %s\n", op_asm(op2));
+    } else if (strcmp(op2, temp_eax) == 0) {
+        fprintf(out, "    mov edx, eax\n");
+        fprintf(out, "    mov ebx, %s\n", op_asm(op1));
+        fprintf(out, "    mov ecx, edx\n");
+    } else {
+        if (strcmp(var_en_eax, op1) == 0) {
+            fprintf(out, "    mov ebx, eax\n");
+        } else {
+            fprintf(out, "    mov ebx, %s\n", op_asm(op1));
+        }
+        fprintf(out, "    mov ecx, %s\n", op_asm(op2));
+    }
+
+    fprintf(out, "    mov eax, 1\n");
+    fprintf(out, "pow_loop_%d:\n", p_id);
+    fprintf(out, "    cmp ecx, 0\n");
+    fprintf(out, "    jle pow_end_%d\n", p_id);
+    fprintf(out, "    imul eax, ebx\n");
+    fprintf(out, "    dec ecx\n");
+    fprintf(out, "    jmp pow_loop_%d\n", p_id);
+    fprintf(out, "pow_end_%d:\n\n", p_id);
+
+    strcpy(temp_eax, izq);
+    temp_ecx[0] = '\0';
+    var_en_eax[0] = '\0';
+    var_en_ecx[0] = '\0';
+    is_bool_eax = 0;
+    is_bool_ecx = 0;
+    flags_listas_jnz = 0;
+}
+
 void emitir_arit(FILE *out, const char *izq, const char *op1, const char *op2, const char *inst) {
     if (strcmp(op1, temp_eax) == 0 && strcmp(op2, temp_ecx) == 0) {
         if (strcmp(inst, "and") == 0 || strcmp(inst, "or") == 0) {
@@ -279,30 +323,65 @@ int main(int argc, char **argv) {
             continue;
         }
 
+        static char pend_push[32] = "";
         char var_io[32];
+
+        if (strncmp(p, "push ", 5) == 0) {
+            if (sscanf(p + 5, "%s", pend_push) == 1) {
+                limpiar(pend_push);
+            }
+            continue;
+        }
+
         if (strstr(p, "call output") != NULL) {
-            if (sscanf(p, "push %[^;]", var_io) == 1) {
-                fprintf(out, "    push dword %s\n", op_asm(var_io));
+            char var_inline[32];
+            if (sscanf(p, "push %[^;]", var_inline) == 1) {
+                limpiar(var_inline);
+                strcpy(pend_push, var_inline);
+            }
+            if (pend_push[0] != '\0') {
+                fprintf(out, "    push dword %s\n", op_asm(pend_push));
                 fprintf(out, "    push fmt_out\n");
                 fprintf(out, "    call printf\n");
-                fprintf(out, "    add esp, 8\n");
-                temp_eax[0] = '\0';
-                temp_ecx[0] = '\0';
-                continue;
+                fprintf(out, "    add esp, 8\n\n");
+                pend_push[0] = '\0';
             }
+            temp_eax[0] = '\0';
+            temp_ecx[0] = '\0';
+            var_en_eax[0] = '\0';
+            var_en_ecx[0] = '\0';
+            continue;
         }
+
         if (strstr(p, "call input") != NULL) {
-            char *pop_pos = strstr(p, "pop");
-            if (pop_pos && sscanf(pop_pos, "pop %s", var_io) == 1) {
+            char *pop_pos = strstr(p, "pop ");
+            if (pop_pos && sscanf(pop_pos + 4, "%s", var_io) == 1) {
                 limpiar(var_io);
                 fprintf(out, "    push %s\n", var_io);
                 fprintf(out, "    push fmt_in\n");
                 fprintf(out, "    call scanf\n");
-                fprintf(out, "    add esp, 8\n");
+                fprintf(out, "    add esp, 8\n\n");
                 temp_eax[0] = '\0';
                 temp_ecx[0] = '\0';
-                continue;
+                var_en_eax[0] = '\0';
+                var_en_ecx[0] = '\0';
             }
+            continue;
+        }
+
+        if (strncmp(p, "pop ", 4) == 0) {
+            if (sscanf(p + 4, "%s", var_io) == 1) {
+                limpiar(var_io);
+                fprintf(out, "    push %s\n", var_io);
+                fprintf(out, "    push fmt_in\n");
+                fprintf(out, "    call scanf\n");
+                fprintf(out, "    add esp, 8\n\n");
+                temp_eax[0] = '\0';
+                temp_ecx[0] = '\0';
+                var_en_eax[0] = '\0';
+                var_en_ecx[0] = '\0';
+            }
+            continue;
         }
 
         char *eq = strchr(p, '=');
@@ -356,19 +435,31 @@ int main(int argc, char **argv) {
                 op1[len1] = '\0';
                 strcpy(op2, sub_pos + 1);
                 emitir_arit(out, izq, op1, op2, "sub");
+            } else if (strstr(d, "**")) {
+                sscanf(d, "%[^*]**%s", op1, op2);
+                emitir_potencia(out, izq, op1, op2);
             } else if (strchr(d, '*')) {
                 sscanf(d, "%[^*]*%s", op1, op2);
                 emitir_arit(out, izq, op1, op2, "imul");
             } else if (strchr(d, '/')) {
                 sscanf(d, "%[^/]/%s", op1, op2);
-                if (strcmp(op1, temp_eax) != 0) {
-                    fprintf(out, "    mov eax, %s\n", op_asm(op1));
+                if (strcmp(op2, temp_eax) == 0) {
+                    fprintf(out, "    mov ecx, eax\n");
+                    if (strcmp(var_en_eax, op1) != 0) {
+                        fprintf(out, "    mov eax, %s\n", op_asm(op1));
+                    }
+                } else {
+                    if (strcmp(op1, temp_eax) != 0) {
+                        fprintf(out, "    mov eax, %s\n", op_asm(op1));
+                    }
+                    fprintf(out, "    mov ecx, %s\n", op_asm(op2));
                 }
                 fprintf(out, "    cdq\n");
-                fprintf(out, "    mov ecx, %s\n", op_asm(op2));
                 fprintf(out, "    idiv ecx\n");
                 strcpy(temp_eax, izq);
                 temp_ecx[0] = '\0';
+                var_en_eax[0] = '\0';
+                var_en_ecx[0] = '\0';
             } else {
                 if (es_temp(d)) {
                     if (strcmp(d, temp_ecx) == 0) {

@@ -1,14 +1,10 @@
 main:
         DECL a
-        DECL i
-        DECL total
-        a=0;
-        i=1;
-l1:
-        t1=a**2;
-        a=t1;
-        t2=i+1;
-        i=t2;
-        t3=i<=2;
-        ifnz t3 goto l1:
-        total=a;
+        DECL b
+        call input;
+        pop b;
+        t1=1+2;
+        t2=t1+b;
+        a=t2;
+        push a;
+        call output;

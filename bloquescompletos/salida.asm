@@ -1,32 +1,32 @@
+section .data
+    fmt_in db "%d", 0
+    fmt_out db "%d", 10, 0
+
 section .bss
     a resd 1
-    i resd 1
-    total resd 1
+    b resd 1
 
 section .text
     global _start
+    extern printf
+    extern scanf
 
 _start:
 
-    mov dword [a], 0
-    mov dword [i], 1
+    push b
+    push fmt_in
+    call scanf
+    add esp, 8
 
-l1:
-    mov eax, [a]
-    imul eax, [*2]
+    mov eax, 1
+    add eax, 2
+    add eax, [b]
     mov [a], eax
-    mov eax, [i]
-    add eax, 1
-    mov [i], eax
+    push dword [a]
+    push fmt_out
+    call printf
+    add esp, 8
 
-    ; condicion: i <= 2
-    cmp eax, 2
-    setle al
-    test al, al
-    jnz l1    ; salta si se cumple
-
-    mov eax, [a]
-    mov [total], eax
 
     ; Salida del programa
     mov eax, 1 
