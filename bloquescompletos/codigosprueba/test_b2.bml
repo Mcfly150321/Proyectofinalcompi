@@ -8,10 +8,4 @@ BEGIN
     i := i  + 1;
   WHILE(i<=2 AND 1>0)
   total := a;
-  d ALLOCATE;
-  FOR i := 1 to 5 do
-BEGIN
-total := total + 1;
-END
-
 END

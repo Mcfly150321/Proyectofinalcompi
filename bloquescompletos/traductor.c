@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
         fprintf(out, "    %s resd 1\n", vars[i]);
     }
     fprintf(out, "\nsection .text\n");
-    fprintf(out, "    global main\n");
+    fprintf(out, "    global _start\n");
     if (usa_out) fprintf(out, "    extern printf\n");
     if (usa_in) fprintf(out, "    extern scanf\n");
     fprintf(out, "\n");
@@ -177,8 +177,8 @@ int main(int argc, char **argv) {
         while (*p == ' ' || *p == '\t') p++;
         if (!*p || strncmp(p, "DECL", 4) == 0) continue;
 
-        if (strcmp(p, "main:") == 0) {
-            fprintf(out, "main:\n");
+        if (strcmp(p, "main:") == 0) { /*esto es main porque el tdc imprime main en su bloque, por eso comparamos con el bloque main*/
+            fprintf(out, "_start:\n");
             continue;
         }
 
@@ -329,8 +329,10 @@ int main(int argc, char **argv) {
         }
     }
 
-    fprintf(out, "    xor eax, eax\n");
-    fprintf(out, "    ret\n");
+    fprintf(out, "\n    ; Salida del programa\n");
+    fprintf(out, "    mov eax, 1 \n");
+    fprintf(out, "    xor ebx, ebx \n");
+    fprintf(out, "    int 0x80 \n");
 
     fclose(in);
     fclose(out);
